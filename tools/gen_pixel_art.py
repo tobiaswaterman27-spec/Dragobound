@@ -201,6 +201,8 @@ def make_palette(bases):
 # Humanoid builder -- chibi proportions, 32x44.
 # ---------------------------------------------------------------------------
 def build_humanoid(spec, direction, step, attack=False):
+    """GBA-trainer chassis: huge head (over half the figure), vertical bar
+    eyes, no mouth/nose, tiny body with elbows-out akimbo arms."""
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     child = spec.get("child", False)
@@ -210,27 +212,23 @@ def build_humanoid(spec, direction, step, attack=False):
 
     # ---------------- layout ----------------
     if child:
-        hd = dict(cap=(9, 12, 22, 21), face=(10, 15, 21, 30), eye_y=24,
-                  eyes=((12, 14), (18, 20)), nose=(15, 27), mouth=(15, 29))
-        t_top, t_bot, t_l, t_r = 31, 37, 10, 21
-        l_top, l_bot, b_top, b_bot = 38, 40, 41, 43
+        cap = (8, 12, 23, 21)
+        face = (9, 15, 22, 30)
+        eye_cols, eye_y, eye_h = ((12, 13), (18, 19)), 21, 3
+        t_top, t_bot, t_l, t_r = 32, 38, 10, 21
+        l_top, l_bot, b_top, b_bot = 39, 40, 41, 43
         ll, rl = (11, 14), (17, 20)
-        a_slv, a_hand = (32, 35), (36, 37)
-        arm_l, arm_r = (7, 9), (22, 24)
         side_arm = (16, 20)
     else:
-        # GBA-Pokemon proportions: the head is well over half the figure, the
-        # body a short block with stubby legs
-        hd = dict(cap=(7, 4, 24, 15), face=(8, 8, 23, 25), eye_y=18,
-                  eyes=((11, 13), (19, 21)), nose=(15, 22), mouth=(15, 24))
-        t_top, t_bot, t_l, t_r = 26, 35, 9, 22
-        l_top, l_bot, b_top, b_bot = 36, 39, 40, 43
+        cap = (4, 2, 27, 14)
+        face = (5, 8, 26, 26)
+        eye_cols, eye_y, eye_h = ((10, 11), (20, 21)), 17, 4
+        t_top, t_bot, t_l, t_r = 27, 37, 9, 22
+        l_top, l_bot, b_top, b_bot = 38, 39, 40, 43
         ll, rl = (10, 14), (17, 21)
-        a_slv, a_hand = (27, 31), (32, 34)
-        arm_l, arm_r = (6, 8), (23, 25)
         side_arm = (16, 21)
 
-    # ---------------- legs & feet ----------------
+    # ---------------- legs & feet (stubby) ----------------
     lo = max(step, 0)
     ro = max(-step, 0)
     if robe_like:
@@ -250,9 +248,9 @@ def build_humanoid(spec, direction, step, attack=False):
         d.rectangle([ll[0], b_top + lo, ll[0], b_bot + lo], fill=m("bootsShadow"))
         d.rectangle([rl[0], b_top + ro, rl[1], b_bot + ro], fill=m("boots"))
         d.rectangle([rl[1], b_top + ro, rl[1], b_bot + ro], fill=m("bootsShadow"))
-        # boot cuffs
-        d.rectangle([ll[0], b_top + lo, ll[1], b_top + lo], fill=m("bootsShadow"))
-        d.rectangle([rl[0], b_top + ro, rl[1], b_top + ro], fill=m("bootsShadow"))
+        # accent stripe on the feet (reference has a colored shoe band)
+        d.rectangle([ll[0] + 1, b_top + 1 + lo, ll[1] - 1, b_top + 1 + lo], fill=m("accent2"))
+        d.rectangle([rl[0] + 1, b_top + 1 + ro, rl[1] - 1, b_top + 1 + ro], fill=m("accent2"))
 
     # ---------------- torso / garment ----------------
     if robe_like:
@@ -261,246 +259,239 @@ def build_humanoid(spec, direction, step, attack=False):
         d.polygon([(t_l - 1, t_bot), (t_r + 1, t_bot), (t_r + 2, 41), (t_l - 2, 41)], fill=m("torso"))
         d.rectangle([t_l - 1, t_top, t_l - 1, t_bot], fill=m("torsoShadow"))
         d.rectangle([t_r + 1, t_top, t_r + 1, t_bot], fill=m("torsoShadow"))
-        d.rectangle([t_l - 2, 40, t_r + 2, 41], fill=m("torsoShadow"))  # hem shadow
+        d.rectangle([t_l - 2, 40, t_r + 2, 41], fill=m("torsoShadow"))
         if direction != "up":
             d.rectangle([t_l + 1, t_top, t_l + 2, 41], fill=m("accent"))
             d.rectangle([t_r - 2, t_top, t_r - 1, 41], fill=m("accent"))
         if spec.get("sash"):
-            d.rectangle([t_l - 1, 30, t_r + 1, 31], fill=m("accent2"))
-        # center fold lines on the skirt
-        d.line([(15, t_bot + 1), (14, 40)], fill=m("torsoShadow"))
-        d.line([(17, t_bot + 1), (18, 40)], fill=m("torsoShadow"))
-        # feet peeking
+            d.rectangle([t_l - 1, t_top + 4, t_r + 1, t_top + 5], fill=m("accent2"))
         d.rectangle([11 + sway, 42, 14 + sway, 43], fill=m("boots"))
         d.rectangle([17 + sway, 42, 20 + sway, 43], fill=m("boots"))
     elif garment == "overalls":
-        d.rectangle([t_l, t_top, t_r, 29], fill=m("torso"))              # shirt
-        d.rectangle([t_l, 30, t_r, t_bot], fill=m("pants"))              # overall body
-        d.rectangle([11, t_top, 12, 29], fill=m("pants"))                # straps
-        d.rectangle([19, t_top, 20, 29], fill=m("pants"))
-        d.point([(11, 30), (20, 30)], fill=m("buckle"))                  # strap buttons
-        d.rectangle([13, 32, 18, 34], fill=m("pantsShadow"))             # bib pocket
+        d.rectangle([t_l, t_top, t_r, t_top + 3], fill=m("torso"))
+        d.rectangle([t_l, t_top + 4, t_r, t_bot], fill=m("pants"))
+        d.rectangle([11, t_top, 12, t_top + 3], fill=m("pants"))
+        d.rectangle([19, t_top, 20, t_top + 3], fill=m("pants"))
+        d.point([(11, t_top + 4), (20, t_top + 4)], fill=m("buckle"))
+        d.rectangle([13, t_top + 6, 18, t_top + 8], fill=m("pantsShadow"))
         d.rectangle([t_l, t_top, t_l, t_bot], fill=m("torsoShadow"))
         d.rectangle([t_r, t_top, t_r, t_bot], fill=m("torsoShadow"))
     elif garment == "armor":
         d.rectangle([t_l, t_top, t_r, t_bot], fill=m("metal"))
         d.rectangle([t_l, t_top, t_l + 1, t_bot], fill=m("metalShadow"))
         d.rectangle([t_r - 1, t_top, t_r, t_bot], fill=m("metalShadow"))
-        d.line([(t_l + 2, 30), (t_r - 2, 30)], fill=m("metalShadow"))    # breastplate seam
-        d.rectangle([13, 29, 18, 38], fill=m("accent"))                  # tabard
-        d.rectangle([15, 29, 16, 38], fill=m("gold"))                    # tabard stripe
-        d.rectangle([4, t_top, t_l - 1, t_top + 2], fill=m("metal"))     # pauldrons
-        d.rectangle([t_r + 1, t_top, 27, t_top + 2], fill=m("metal"))
-        d.rectangle([4, t_top + 2, t_l - 1, t_top + 2], fill=m("metalShadow"))
-        d.rectangle([t_r + 1, t_top + 2, 27, t_top + 2], fill=m("metalShadow"))
+        d.line([(t_l + 2, t_top + 5), (t_r - 2, t_top + 5)], fill=m("metalShadow"))
+        d.rectangle([13, t_top + 3, 18, t_bot + 1], fill=m("accent"))
+        d.rectangle([15, t_top + 3, 16, t_bot + 1], fill=m("gold"))
     else:  # tunic
         d.rectangle([t_l, t_top, t_r, t_bot], fill=m("torso"))
         d.rectangle([t_l, t_top, t_l, t_bot], fill=m("torsoShadow"))
         d.rectangle([t_r, t_top, t_r, t_bot], fill=m("torsoShadow"))
-        d.rectangle([t_l, t_bot, t_r, t_bot], fill=m("torsoShadow"))     # hem
-        d.rectangle([t_l + 1, t_top, t_r - 1, t_top], fill=m("accent2")) # collar
-        if not child:
-            d.line([(16, t_top + 2), (16, t_bot - 3)], fill=m("torsoShadow"))  # center fold
+        d.rectangle([t_l, t_bot, t_r, t_bot], fill=m("torsoShadow"))
+        # collar V (reference has a V-neck accent)
+        d.line([(13, t_top), (15, t_top + 2)], fill=m("accent2"))
+        d.line([(18, t_top), (16, t_top + 2)], fill=m("accent2"))
         if spec.get("strap") and direction == "down":
-            for i in range(9):
-                x = t_l + 1 + i * 1.4
+            for i in range(7):
+                x = t_l + 1 + i * 1.6
                 y = t_top + 1 + i
                 d.rectangle([int(x), y, int(x) + 1, y], fill=m("accent"))
         if spec.get("strap") and direction == "up":
-            for i in range(9):
-                x = t_r - 1 - i * 1.4
+            for i in range(7):
+                x = t_r - 1 - i * 1.6
                 y = t_top + 1 + i
                 d.rectangle([int(x) - 1, y, int(x), y], fill=m("accent"))
 
     # belt
     if garment in ("tunic", "armor") and not child:
-        d.rectangle([t_l, 33, t_r, 34], fill=m("belt"))
+        d.rectangle([t_l, t_bot - 2, t_r, t_bot - 1], fill=m("belt"))
         if direction == "down":
-            d.rectangle([15, 33, 16, 34], fill=m("buckle"))
+            d.rectangle([15, t_bot - 2, 16, t_bot - 1], fill=m("buckle"))
 
     # ---------------- arms ----------------
     sleeve = m("metal") if garment == "armor" else m("torso")
     sleeve_sh = m("metalShadow") if garment == "armor" else m("torsoShadow")
+    sh_y = t_top + 1  # shoulder row
+
+    def akimbo_left(off):
+        d.polygon([(t_l, sh_y + off), (t_l - 5, sh_y + 2 + off), (t_l - 5, sh_y + 5 + off),
+                   (t_l - 1, sh_y + 4 + off)], fill=sleeve)
+        d.rectangle([t_l - 5, sh_y + 5 + off, t_l - 3, sh_y + 7 + off], fill=m("skin"))
+        if spec.get("bracers"):
+            d.rectangle([t_l - 5, sh_y + 4 + off, t_l - 3, sh_y + 5 + off], fill=m("belt"))
+
+    def akimbo_right(off):
+        d.polygon([(t_r, sh_y + off), (t_r + 5, sh_y + 2 + off), (t_r + 5, sh_y + 5 + off),
+                   (t_r + 1, sh_y + 4 + off)], fill=sleeve)
+        d.rectangle([t_r + 3, sh_y + 5 + off, t_r + 5, sh_y + 7 + off], fill=m("skin"))
+        if spec.get("bracers"):
+            d.rectangle([t_r + 3, sh_y + 4 + off, t_r + 5, sh_y + 5 + off], fill=m("belt"))
+
     if attack:
         blade = m("metal")
         if direction == "side":
-            # thrust: arm extended forward, blade out in front
-            d.rectangle([side_arm[1] - 3, a_slv[0] + 1, side_arm[1] + 1, a_slv[0] + 3], fill=sleeve)
-            d.rectangle([side_arm[1] + 2, a_slv[0] + 1, side_arm[1] + 3, a_slv[0] + 3], fill=m("skin"))
-            d.rectangle([side_arm[1] + 4, a_slv[0], side_arm[1] + 4, a_slv[0] + 4], fill=m("gold"))
-            d.rectangle([side_arm[1] + 5, a_slv[0] + 1, 31, a_slv[0] + 2], fill=blade)
+            d.rectangle([side_arm[1] - 3, sh_y + 1, side_arm[1] + 1, sh_y + 3], fill=sleeve)
+            d.rectangle([side_arm[1] + 2, sh_y + 1, side_arm[1] + 3, sh_y + 3], fill=m("skin"))
+            d.rectangle([side_arm[1] + 4, sh_y, side_arm[1] + 4, sh_y + 4], fill=m("gold"))
+            d.rectangle([side_arm[1] + 5, sh_y + 1, 31, sh_y + 2], fill=blade)
         elif direction == "down":
-            d.rectangle([arm_l[0], a_slv[0], arm_l[1], a_slv[1]], fill=sleeve)
-            d.rectangle([arm_l[0], a_hand[0], arm_l[1], a_hand[1]], fill=m("skin"))
-            # sword arm swings low, blade pointing down beside the leg
-            d.rectangle([arm_r[0], a_slv[0], arm_r[1], a_slv[0] + 2], fill=sleeve)
-            d.rectangle([arm_r[0] + 1, a_slv[0] + 3, arm_r[1] + 1, a_slv[0] + 5], fill=m("skin"))
-            d.rectangle([arm_r[0], a_slv[0] + 6, arm_r[1] + 2, a_slv[0] + 6], fill=m("gold"))
-            d.rectangle([arm_r[0] + 2, a_slv[0] + 7, arm_r[0] + 3, 42], fill=blade)
-        else:  # up: blade raised high beside the head
-            d.rectangle([arm_l[0], a_slv[0], arm_l[1], a_slv[1]], fill=sleeve)
-            d.rectangle([arm_l[0], a_hand[0], arm_l[1], a_hand[1]], fill=m("skin"))
-            d.rectangle([arm_r[0], t_top - 1, arm_r[1] + 2, t_top + 1], fill=sleeve)
-            d.rectangle([26, t_top - 4, 28, t_top - 2], fill=m("skin"))
-            d.rectangle([25, t_top - 5, 29, t_top - 5], fill=m("gold"))
-            d.rectangle([26, 4, 27, t_top - 6], fill=blade)
+            akimbo_left(0)
+            d.rectangle([t_r, sh_y, t_r + 2, sh_y + 2], fill=sleeve)
+            d.rectangle([t_r + 3, sh_y + 3, t_r + 5, sh_y + 5], fill=m("skin"))
+            d.rectangle([t_r + 2, sh_y + 6, t_r + 6, sh_y + 6], fill=m("gold"))
+            d.rectangle([t_r + 4, sh_y + 7, t_r + 5, 42], fill=blade)
+        else:  # up
+            akimbo_left(0)
+            d.rectangle([t_r, sh_y - 1, t_r + 3, sh_y + 1], fill=sleeve)
+            d.rectangle([t_r + 3, sh_y - 3, t_r + 5, sh_y - 1], fill=m("skin"))
+            d.rectangle([t_r + 2, sh_y - 4, t_r + 6, sh_y - 4], fill=m("gold"))
+            d.rectangle([t_r + 3, 3, t_r + 4, sh_y - 5], fill=blade)
     elif direction == "side":
-        d.rectangle([side_arm[0], a_slv[0] + arm_off, side_arm[1], a_slv[1] + arm_off], fill=sleeve)
-        d.rectangle([side_arm[0], a_slv[0] + arm_off, side_arm[0], a_slv[1] + arm_off], fill=sleeve_sh)
-        d.rectangle([side_arm[0], a_slv[1] + arm_off, side_arm[1], a_slv[1] + arm_off], fill=sleeve_sh)  # cuff
-        d.rectangle([side_arm[0] + 1, a_hand[0] + arm_off, side_arm[1] - 1, a_hand[1] + arm_off], fill=m("skin"))
+        # one visible arm: elbow bowed out in front
+        d.polygon([(side_arm[0] + 1, sh_y + arm_off), (side_arm[1] + 3, sh_y + 2 + arm_off),
+                   (side_arm[1] + 3, sh_y + 5 + arm_off), (side_arm[0] + 2, sh_y + 4 + arm_off)], fill=sleeve)
+        d.rectangle([side_arm[1], sh_y + 5 + arm_off, side_arm[1] + 2, sh_y + 7 + arm_off], fill=m("skin"))
         if spec.get("staff"):
-            d.rectangle([24, 8, 25, 41], fill=m("wood"))
-            d.rectangle([24, 8, 24, 41], fill=m("bootsShadow"))
-            d.ellipse([22, 3, 27, 8], fill=m("orb"))
+            d.rectangle([27, 8, 28, 41], fill=m("wood"))
+            d.rectangle([27, 8, 27, 41], fill=m("bootsShadow"))
+            d.ellipse([25, 3, 30, 8], fill=m("orb"))
     else:
         left_arm = not (spec.get("one_arm") and direction == "down")
         right_arm = not (spec.get("one_arm") and direction == "up")
-        for present, (ax0, ax1), off in ((left_arm, arm_l, arm_off), (right_arm, arm_r, -arm_off)):
-            if present:
-                d.rectangle([ax0, a_slv[0] + off, ax1, a_slv[1] + off], fill=sleeve)
-                d.rectangle([ax0, a_slv[1] + off, ax1, a_slv[1] + off], fill=sleeve_sh)  # cuff
-                if spec.get("bracers"):
-                    d.rectangle([ax0, a_slv[1] - 1 + off, ax1, a_slv[1] + off], fill=m("belt"))
-                d.rectangle([ax0, a_hand[0] + off, ax1, a_hand[1] + off], fill=m("skin"))
+        if child:
+            # children keep simple straight arms
+            for present, (ax0, ax1), off in ((left_arm, (8, 9), arm_off), (right_arm, (22, 23), -arm_off)):
+                d.rectangle([ax0, t_top + 1 + off, ax1, t_top + 4 + off], fill=sleeve)
+                d.rectangle([ax0, t_top + 5 + off, ax1, t_top + 6 + off], fill=m("skin"))
+        else:
+            if left_arm:
+                akimbo_left(arm_off)
             else:
-                d.rectangle([ax0, a_slv[0], ax1, a_slv[0] + 3], fill=sleeve)
-                d.rectangle([ax0, a_slv[0] + 3, ax1, a_slv[0] + 4], fill=sleeve_sh)  # pinned fold
+                d.rectangle([t_l - 3, sh_y, t_l - 1, sh_y + 3], fill=sleeve)
+                d.rectangle([t_l - 3, sh_y + 3, t_l - 1, sh_y + 4], fill=sleeve_sh)
+            if right_arm:
+                akimbo_right(-arm_off)
+            else:
+                d.rectangle([t_r + 1, sh_y, t_r + 3, sh_y + 3], fill=sleeve)
+                d.rectangle([t_r + 1, sh_y + 3, t_r + 3, sh_y + 4], fill=sleeve_sh)
         if spec.get("staff") and direction == "down":
-            d.rectangle([26, 8, 27, 41], fill=m("wood"))
-            d.ellipse([24, 3, 29, 8], fill=m("orb"))
+            d.rectangle([28, 8, 29, 41], fill=m("wood"))
+            d.ellipse([26, 3, 31, 8], fill=m("orb"))
 
     # ---------------- head ----------------
     hair = spec.get("hair", "short")
     headgear = spec.get("headgear")
-    cap = hd["cap"]
-    face = hd["face"]
-    ey = hd["eye_y"]
 
     if direction == "down":
         d.ellipse(list(face), fill=m("skin"))
-        # Pokemon-style line eyes: simple horizontal dashes
-        for ex0, ex1 in hd["eyes"]:
-            d.rectangle([ex0, ey, ex1, ey], fill=m("eye"))
-        d.point([(hd["nose"][0], hd["nose"][1]), (hd["nose"][0] + 1, hd["nose"][1])], fill=m("skinShadow"))
+        # vertical bar eyes (GBA style), no mouth, no nose
+        for ex0, ex1 in eye_cols:
+            d.rectangle([ex0, eye_y, ex1, eye_y + eye_h], fill=m("eye"))
         if spec.get("beard"):
-            d.ellipse([face[0] + 2, ey + 3, face[2] - 2, face[3] + 4], fill=m("beard"))
-            d.rectangle([hd["eyes"][0][0], ey + 3, hd["eyes"][1][1], ey + 4], fill=m("beard"))  # mustache
-            d.line([(face[0] + 4, face[3] + 2), (face[0] + 5, face[3] + 3)], fill=m("beardShadow"))
-        else:
-            d.rectangle([hd["mouth"][0], hd["mouth"][1], hd["mouth"][0] + 1, hd["mouth"][1]], fill=m("mouth"))
-            # blush/cheek shading
-            d.point([(face[0] + 2, ey + 2), (face[2] - 2, ey + 2)], fill=m("skinShadow"))
+            d.ellipse([face[0] + 3, eye_y + eye_h + 1, face[2] - 3, face[3] + 4], fill=m("beard"))
     elif direction == "up":
         d.ellipse(list(face), fill=m("skinShadow"))
     else:  # side
-        d.ellipse([face[0] + 3, face[1], face[2] + 2, face[3]], fill=m("skin"))
-        ex = face[2] - 4
-        d.rectangle([ex, ey, ex + 2, ey], fill=m("eye"))  # line eye
-        d.point([(face[2] + 2, ey + 3)], fill=m("skinShadow"))  # nose bump
+        d.ellipse([face[0] + 4, face[1], face[2] + 2, face[3]], fill=m("skin"))
+        ex = face[2] - 5
+        d.rectangle([ex, eye_y, ex + 1, eye_y + eye_h], fill=m("eye"))
         if spec.get("beard"):
-            d.rectangle([face[0] + 6, ey + 3, face[2] + 1, face[3] + 3], fill=m("beard"))
-        else:
-            d.point([(face[2] - 1, ey + 5)], fill=m("mouth"))
+            d.rectangle([face[0] + 8, eye_y + eye_h + 1, face[2] + 1, face[3] + 3], fill=m("beard"))
 
     def front_hair():
         if headgear == "helm":
-            d.ellipse([cap[0], cap[1], cap[2], cap[3] - 2], fill=m("metal"))
-            d.rectangle([cap[0], 15, cap[0] + 2, 23], fill=m("metal"))    # cheek guards
-            d.rectangle([cap[2] - 2, 15, cap[2], 23], fill=m("metalShadow"))
-            d.rectangle([15, 13, 16, 19], fill=m("metalShadow"))          # nose guard
-            d.line([(cap[0] + 2, cap[1] + 3), (cap[0] + 2, cap[3] - 4)], fill=m("metalShadow"))
+            d.ellipse([cap[0], cap[1], cap[2], cap[3]], fill=m("metal"))
+            d.rectangle([cap[0], cap[3] + 1, cap[0] + 2, cap[3] + 9], fill=m("metal"))
+            d.rectangle([cap[2] - 2, cap[3] + 1, cap[2], cap[3] + 9], fill=m("metalShadow"))
+            d.rectangle([15, cap[3] - 2, 16, eye_y + eye_h], fill=m("metalShadow"))
             return
         if headgear == "straw_hat":
-            d.ellipse([cap[0] - 3, 12, cap[2] + 3, 17], fill=m("straw"))  # brim
-            d.ellipse([cap[0] + 2, 5, cap[2] - 2, 14], fill=m("straw"))   # dome
-            d.rectangle([cap[0] + 2, 12, cap[2] - 2, 13], fill=m("belt")) # band
+            d.ellipse([cap[0] - 3, cap[3] - 3, cap[2] + 3, cap[3] + 2], fill=m("straw"))
+            d.ellipse([cap[0] + 2, cap[1] + 1, cap[2] - 2, cap[3] - 1], fill=m("straw"))
+            d.rectangle([cap[0] + 2, cap[3] - 3, cap[2] - 2, cap[3] - 2], fill=m("belt"))
             return
-        # hair cap over the top half of the head
-        d.ellipse([cap[0], cap[1], cap[2], cap[3]], fill=m("hair"))
-        d.rectangle([cap[0], cap[3] - 5, cap[0] + 1, cap[3] + 1], fill=m("hair"))  # side tufts
-        d.rectangle([cap[2] - 1, cap[3] - 5, cap[2], cap[3] + 1], fill=m("hair"))
-        d.rectangle([cap[2] - 1, cap[3] - 3, cap[2], cap[3] + 1], fill=m("hairShadow"))
-        # fringe: uneven teeth over the forehead
-        fy = cap[3] - 2
-        for fx0, fx1, fdrop in (
-            (cap[0] + 2, cap[0] + 4, 2), (cap[0] + 5, cap[0] + 7, 1),
-            (cap[0] + 8, cap[0] + 10, 3), (cap[0] + 11, cap[0] + 13, 1),
-            (cap[0] + 14, cap[2] - 2, 2),
-        ):
-            fx1 = min(fx1, cap[2] - 2)
-            if fx1 >= fx0:
-                d.rectangle([fx0, fy, fx1, fy + fdrop], fill=m("hair"))
+        # clean rounded cap with a straight fringe edge + two small notches
+        d.ellipse(list(cap), fill=m("hair"))
+        d.rectangle([cap[0], cap[3] - 3, cap[2], cap[3]], fill=m("hair"))
+        d.point([(11, cap[3] + 1), (12, cap[3] + 1), (19, cap[3] + 1), (20, cap[3] + 1)], fill=m("hair"))
+        # side locks framing the face
+        d.rectangle([cap[0], cap[3], cap[0] + 1, cap[3] + 7], fill=m("hair"))
+        d.rectangle([cap[2] - 1, cap[3], cap[2], cap[3] + 7], fill=m("hairShadow"))
         if hair == "spiky":
-            for sx in (cap[0] + 3, cap[0] + 8, cap[0] + 13):
+            for sx in (cap[0] + 4, 14, cap[2] - 7):
                 d.polygon([(sx, cap[1] + 2), (sx + 2, cap[1] - 2), (sx + 4, cap[1] + 2)], fill=m("hair"))
         if hair == "long":
-            d.rectangle([cap[0] - 1, cap[3] - 6, cap[0], t_top + 4], fill=m("hair"))
-            d.rectangle([cap[2], cap[3] - 6, cap[2] + 1, t_top + 4], fill=m("hair"))
+            d.rectangle([cap[0] - 1, cap[3], cap[0], t_top + 3], fill=m("hair"))
+            d.rectangle([cap[2], cap[3], cap[2] + 1, t_top + 3], fill=m("hair"))
         if hair == "bun":
-            d.ellipse([cap[2] - 4, cap[1] - 2, cap[2] + 1, cap[1] + 3], fill=m("hair"))
-            d.ellipse([cap[2] - 3, cap[1] - 1, cap[2], cap[1] + 2], fill=m("hairShadow"))
+            d.ellipse([cap[2] - 5, cap[1] - 2, cap[2], cap[1] + 3], fill=m("hair"))
+            d.ellipse([cap[2] - 4, cap[1] - 1, cap[2] - 1, cap[1] + 2], fill=m("hairShadow"))
         if hair == "bald_fringe":
-            # erase the cap: redraw scalp as skin, keep side tufts only
-            d.ellipse([cap[0] + 1, cap[1] + 2, cap[2] - 1, cap[3]], fill=m("skin"))
-            d.rectangle([cap[0], cap[3] - 5, cap[0] + 1, cap[3] + 2], fill=m("hair"))
-            d.rectangle([cap[2] - 1, cap[3] - 5, cap[2], cap[3] + 2], fill=m("hair"))
+            d.ellipse([cap[0] + 2, cap[1] + 2, cap[2] - 2, cap[3] + 1], fill=m("skin"))
+            d.rectangle([cap[0], cap[3] - 2, cap[0] + 2, cap[3] + 6], fill=m("hair"))
+            d.rectangle([cap[2] - 2, cap[3] - 2, cap[2], cap[3] + 6], fill=m("hair"))
         if headgear == "circlet":
-            d.rectangle([cap[0] + 1, cap[3] - 4, cap[2] - 1, cap[3] - 3], fill=m("gold"))
+            d.rectangle([cap[0] + 1, cap[3] - 2, cap[2] - 1, cap[3] - 1], fill=m("gold"))
         if headgear == "crown":
-            d.rectangle([cap[0] + 1, cap[1] + 2, cap[2] - 1, cap[1] + 4], fill=m("gold"))
-            for sx in (cap[0] + 3, 15, cap[2] - 4):
+            d.rectangle([cap[0] + 2, cap[1] + 2, cap[2] - 2, cap[1] + 4], fill=m("gold"))
+            for sx in (cap[0] + 4, 15, cap[2] - 5):
                 d.rectangle([sx, cap[1], sx + 1, cap[1] + 2], fill=m("gold"))
 
     def back_hair():
         if headgear == "helm":
             d.ellipse([cap[0], cap[1], cap[2], cap[3] + 2], fill=m("metal"))
-            d.rectangle([cap[0] + 2, cap[3] + 1, cap[2] - 2, cap[3] + 4], fill=m("metalShadow"))  # neck guard
+            # armored collar covers the whole lower head from behind
+            d.rectangle([cap[0] + 3, cap[3] + 2, cap[2] - 3, face[3]], fill=m("metalShadow"))
             return
         if headgear == "straw_hat":
-            d.ellipse([cap[0] - 3, 12, cap[2] + 3, 17], fill=m("straw"))
-            d.ellipse([cap[0] + 2, 5, cap[2] - 2, 14], fill=m("straw"))
+            # hair fills the head below the brim
+            d.rectangle([cap[0] + 4, cap[3], cap[2] - 4, face[3]], fill=m("hair"))
+            d.ellipse([cap[0] - 3, cap[3] - 3, cap[2] + 3, cap[3] + 2], fill=m("straw"))
+            d.ellipse([cap[0] + 2, cap[1] + 1, cap[2] - 2, cap[3] - 1], fill=m("straw"))
             return
-        d.ellipse([cap[0], cap[1], cap[2], cap[3] + 4], fill=m("hair"))
-        d.rectangle([cap[0] + 1, cap[3], cap[0] + 4, cap[3] + 3], fill=m("hairShadow"))
+        # hair covers the entire back of the head -- no bare skin showing
+        d.ellipse([cap[0], cap[1], cap[2], cap[3] + 7], fill=m("hair"))
+        d.rectangle([cap[0] + 2, cap[3], cap[2] - 2, face[3]], fill=m("hair"))
+        d.rectangle([cap[0] + 2, cap[3] + 2, cap[0] + 6, face[3]], fill=m("hairShadow"))
         if hair == "long":
-            d.rectangle([cap[0], cap[3], cap[2], t_top + 5], fill=m("hair"))
-            d.rectangle([cap[0], t_top + 4, cap[2], t_top + 5], fill=m("hairShadow"))
+            d.rectangle([cap[0], cap[3], cap[2], t_top + 4], fill=m("hair"))
+            d.rectangle([cap[0], t_top + 3, cap[2], t_top + 4], fill=m("hairShadow"))
         if hair == "bun":
             d.ellipse([13, cap[1] - 2, 20, cap[1] + 5], fill=m("hair"))
             d.ellipse([14, cap[1] - 1, 19, cap[1] + 4], fill=m("hairShadow"))
         if hair == "bald_fringe":
-            d.ellipse([cap[0] + 1, cap[1] + 2, cap[2] - 1, cap[3] + 2], fill=m("skin"))
-            d.rectangle([cap[0], cap[3] - 4, cap[2], cap[3] + 3], fill=m("hair"))  # low band of hair
+            d.ellipse([cap[0] + 2, cap[1] + 2, cap[2] - 2, cap[3] + 2], fill=m("skin"))
+            d.rectangle([cap[0], cap[3] - 1, cap[2], cap[3] + 6], fill=m("hair"))
+            d.rectangle([cap[0] + 4, cap[3] + 7, cap[2] - 4, face[3]], fill=m("skinShadow"))  # neck
         if headgear == "circlet":
-            d.rectangle([cap[0] + 1, cap[3] - 4, cap[2] - 1, cap[3] - 3], fill=m("gold"))
+            d.rectangle([cap[0] + 1, cap[3] - 2, cap[2] - 1, cap[3] - 1], fill=m("gold"))
         if headgear == "crown":
-            d.rectangle([cap[0] + 1, cap[1] + 2, cap[2] - 1, cap[1] + 4], fill=m("gold"))
+            d.rectangle([cap[0] + 2, cap[1] + 2, cap[2] - 2, cap[1] + 4], fill=m("gold"))
 
     def side_hair():
         if headgear == "helm":
-            d.ellipse([cap[0] + 1, cap[1], cap[2] + 1, cap[3] - 2], fill=m("metal"))
-            d.rectangle([cap[2] - 4, 15, cap[2], 22], fill=m("metalShadow"))  # cheek guard
+            d.ellipse([cap[0] + 1, cap[1], cap[2] + 1, cap[3]], fill=m("metal"))
+            d.rectangle([cap[2] - 4, cap[3] + 1, cap[2], cap[3] + 8], fill=m("metalShadow"))
             return
         if headgear == "straw_hat":
-            d.ellipse([cap[0] - 2, 12, cap[2] + 4, 17], fill=m("straw"))
-            d.ellipse([cap[0] + 3, 5, cap[2] - 1, 14], fill=m("straw"))
+            d.ellipse([cap[0] - 2, cap[3] - 3, cap[2] + 4, cap[3] + 2], fill=m("straw"))
+            d.ellipse([cap[0] + 3, cap[1] + 1, cap[2] - 1, cap[3] - 1], fill=m("straw"))
             return
-        d.ellipse([cap[0] + 1, cap[1], cap[2] + 1, cap[3] - 1], fill=m("hair"))
-        d.rectangle([cap[0] + 1, cap[3] - 6, cap[0] + 5, cap[3] + 5], fill=m("hair"))  # back mass
-        d.rectangle([cap[0] + 1, cap[3] - 2, cap[0] + 2, cap[3] + 4], fill=m("hairShadow"))
+        d.ellipse([cap[0] + 1, cap[1], cap[2] + 1, cap[3]], fill=m("hair"))
+        d.rectangle([cap[0] + 1, cap[3] - 4, cap[0] + 6, cap[3] + 8], fill=m("hair"))
+        d.rectangle([cap[0] + 1, cap[3], cap[0] + 2, cap[3] + 7], fill=m("hairShadow"))
         if hair == "spiky":
-            d.polygon([(cap[0] + 3, cap[1] + 2), (cap[0], cap[1] - 1), (cap[0] + 5, cap[1] + 1)], fill=m("hair"))
+            d.polygon([(cap[0] + 4, cap[1] + 2), (cap[0] + 1, cap[1] - 1), (cap[0] + 6, cap[1] + 1)], fill=m("hair"))
         if hair == "long":
-            d.rectangle([cap[0] + 1, cap[3], cap[0] + 4, t_top + 4], fill=m("hair"))
+            d.rectangle([cap[0] + 1, cap[3], cap[0] + 5, t_top + 3], fill=m("hair"))
         if hair == "bun":
             d.ellipse([cap[0] - 1, cap[1] + 3, cap[0] + 4, cap[1] + 9], fill=m("hair"))
             d.ellipse([cap[0], cap[1] + 4, cap[0] + 3, cap[1] + 8], fill=m("hairShadow"))
         if hair == "bald_fringe":
-            d.ellipse([cap[0] + 2, cap[1] + 2, cap[2], cap[3] - 1], fill=m("skin"))
-            d.rectangle([cap[0] + 1, cap[3] - 5, cap[0] + 4, cap[3] + 3], fill=m("hair"))
+            d.ellipse([cap[0] + 3, cap[1] + 2, cap[2], cap[3]], fill=m("skin"))
+            d.rectangle([cap[0] + 1, cap[3] - 3, cap[0] + 5, cap[3] + 6], fill=m("hair"))
         if headgear == "circlet":
-            d.rectangle([cap[0] + 2, cap[3] - 4, cap[2], cap[3] - 3], fill=m("gold"))
+            d.rectangle([cap[0] + 2, cap[3] - 2, cap[2], cap[3] - 1], fill=m("gold"))
         if headgear == "crown":
             d.rectangle([cap[0] + 2, cap[1] + 2, cap[2], cap[1] + 4], fill=m("gold"))
 
@@ -514,12 +505,12 @@ def build_humanoid(spec, direction, step, attack=False):
     # ---------------- sword on the back (in hand during attacks) ----------------
     if spec.get("sword") and not attack:
         if direction == "up":
-            d.line([(20, t_top + 2), (12, t_bot + 4)], fill=m("bootsShadow"), width=2)
+            d.line([(20, t_top + 2), (12, t_bot + 2)], fill=m("bootsShadow"), width=2)
             d.rectangle([20, t_top - 3, 21, t_top + 1], fill=m("wood"))
             d.rectangle([19, t_top + 1, 22, t_top + 1], fill=m("gold"))
         elif direction == "down":
-            d.rectangle([24, t_top - 4, 25, t_top - 1], fill=m("wood"))
-            d.rectangle([23, t_top - 1, 26, t_top - 1], fill=m("gold"))
+            d.rectangle([25, t_top - 4, 26, t_top - 1], fill=m("wood"))
+            d.rectangle([24, t_top - 1, 27, t_top - 1], fill=m("gold"))
 
     return img
 
@@ -612,13 +603,15 @@ def build_wyrmling(frame):
         d.point([(23 + hx, 21 - bob), (28 + hx, 20 - bob)], fill=m("horn"))  # fangs
     else:
         d.line([(23 + hx, 21 - bob), (29 + hx, 20 - bob)], fill=m("bodyShadow"))
-    # big cute eye: colored iris, dark pupil, light glint
-    d.ellipse([13 + hx, 12 - bob, 18 + hx, 18 - bob], fill=m("eye"))
-    d.rectangle([16 + hx, 14 - bob, 17 + hx, 16 - bob], fill=m("outline"))
-    d.point([(14 + hx, 13 - bob)], fill=m("horn"))
-    # two small horns
-    d.polygon([(11 + hx, 8 - bob), (12 + hx, 3 - bob), (15 + hx, 7 - bob)], fill=m("horn"))
-    d.polygon([(19 + hx, 6 - bob), (21 + hx, 2 - bob), (23 + hx, 7 - bob)], fill=m("horn"))
+    # narrow predator eye under a heavy brow ridge
+    d.rectangle([13 + hx, 14 - bob, 18 + hx, 16 - bob], fill=m("eye"))
+    d.rectangle([15 + hx, 14 - bob, 16 + hx, 16 - bob], fill=m("outline"))  # slit pupil
+    d.line([(12 + hx, 12 - bob), (19 + hx, 12 - bob)], fill=m("bodyShadow"))  # brow
+    # two swept-back horns + spine spikes
+    d.polygon([(11 + hx, 8 - bob), (10 + hx, 2 - bob), (15 + hx, 7 - bob)], fill=m("horn"))
+    d.polygon([(19 + hx, 6 - bob), (20 + hx, 1 - bob), (23 + hx, 7 - bob)], fill=m("horn"))
+    for sx in (8, 12, 16):
+        d.polygon([(sx, 27 - bob), (sx + 1, 23 - bob), (sx + 3, 27 - bob)], fill=m("horn"))
     return img
 
 
@@ -632,9 +625,9 @@ def build_skitterdrake(frame):
 
     # tail
     d.line([(4, 33 - bob), (0, 27 - bob)], fill=m("body"), width=2)
-    # rounded back frill bumps
-    for fx in (5, 10, 15):
-        d.ellipse([fx, 23 - bob, fx + 4, 28 - bob], fill=m("horn"))
+    # jagged back frill spikes
+    for fx in (5, 9, 13, 17):
+        d.polygon([(fx, 28 - bob), (fx + 2, 22 - bob), (fx + 4, 28 - bob)], fill=m("horn"))
     # long low body
     d.ellipse([2, 26 - bob, 22, 41], fill=m("body"))
     d.ellipse([6, 31 - bob, 19, 40], fill=m("belly"))
@@ -653,10 +646,10 @@ def build_skitterdrake(frame):
         d.point([(24 + hx, 23 - bob), (28 + hx, 22 - bob)], fill=m("horn"))
     else:
         d.line([(24 + hx, 23 - bob), (29 + hx, 22 - bob)], fill=m("bodyShadow"))
-    # big eye
-    d.ellipse([19 + hx, 17 - bob, 23 + hx, 22 - bob], fill=m("eye"))
-    d.rectangle([21 + hx, 19 - bob, 22 + hx, 20 - bob], fill=m("outline"))
-    d.point([(20 + hx, 18 - bob)], fill=m("horn"))
+    # narrow scavenger eye + brow
+    d.rectangle([19 + hx, 18 - bob, 23 + hx, 19 - bob], fill=m("eye"))
+    d.rectangle([21 + hx, 18 - bob, 21 + hx, 19 - bob], fill=m("outline"))
+    d.line([(18 + hx, 16 - bob), (24 + hx, 16 - bob)], fill=m("bodyShadow"))
     return img
 
 
