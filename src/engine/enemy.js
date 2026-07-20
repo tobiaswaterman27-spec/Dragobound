@@ -20,7 +20,7 @@ export class Enemy extends MovableEntity {
     this.attackCd = 0;
     this.attackFlashT = 0;
     this.dead = false;
-    this.facingLeft = false;
+    this.facing = "down";
     this.deathT = 0;
   }
 
@@ -45,7 +45,7 @@ export class Enemy extends MovableEntity {
 
     const dist = Math.hypot(this.gridX - player.gridX, this.gridY - player.gridY);
     const state = this.attackCd > 0.5 ? "attack" : "idle";
-    this.sprite.update(dt, state, this.facingLeft);
+    this.sprite.update(dt, state, this.facing);
 
     if (!this.moving) {
       this.decisionT -= dt;
@@ -77,7 +77,8 @@ export class Enemy extends MovableEntity {
     }
     for (const [ddx, ddy] of options) {
       if (ddx === 0 && ddy === 0) continue;
-      if (ddx !== 0) this.facingLeft = ddx < 0;
+      if (ddx !== 0) this.facing = ddx < 0 ? "left" : "right";
+      else if (ddy !== 0) this.facing = ddy < 0 ? "up" : "down";
       const moved = this.startMove(ddx, ddy, (nx, ny) =>
         map.canWalk(nx, ny) && !(nx === player.gridX && ny === player.gridY)
       );
@@ -88,7 +89,8 @@ export class Enemy extends MovableEntity {
   _wander(map) {
     const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
     const [ddx, ddy] = dirs[Math.floor(Math.random() * dirs.length)];
-    if (ddx !== 0) this.facingLeft = ddx < 0;
+    if (ddx !== 0) this.facing = ddx < 0 ? "left" : "right";
+    else if (ddy !== 0) this.facing = ddy < 0 ? "up" : "down";
     this.startMove(ddx, ddy, (nx, ny) => {
       if (!map.canWalk(nx, ny)) return false;
       return Math.hypot(nx - this.homeX, ny - this.homeY) < this.leashRange;

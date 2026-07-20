@@ -55,8 +55,11 @@ function dragonCanvases(kind) {
   if (dragonCache.has(kind)) return dragonCache.get(kind);
   const data = DRAGONS[kind] || DRAGONS.wyrmling;
   const built = {};
-  for (const frame of ["idle1", "idle2", "attack"]) {
-    built[frame] = buildCanvas(data.shapes[frame], data.palette);
+  for (const dir of ["down", "up", "side"]) {
+    built[dir] = {};
+    for (const frame of ["idle", "idle2", "attack"]) {
+      built[dir][frame] = buildCanvas(data.shapes[dir][frame], data.palette);
+    }
   }
   dragonCache.set(kind, built);
   return built;
@@ -112,32 +115,35 @@ export class ActorSprite {
   }
 }
 
-/** Small creature: idle1/idle2 (bob) + attack (lunge), all pixel-matrix data. */
+const DRAGON_DIR = { down: "down", up: "up", left: "side", right: "side" };
+
+/** Chibi dragon: 3 directions x idle/idle2(bob)/attack, all pixel-matrix data. */
 export class CreatureSprite {
   constructor(paletteName) {
     this.canvases = dragonCanvases(paletteName);
     this.state = "idle";
     this.animTime = 0;
-    this.facingLeft = false;
+    this.facing = "down";
   }
 
-  update(dt, state, facingLeft) {
+  update(dt, state, facing) {
     if (this.state !== state) this.animTime = 0;
     this.state = state;
-    this.facingLeft = facingLeft;
+    this.facing = facing;
     this.animTime += dt;
   }
 
   draw(ctx, screenX, screenY, w = FRAME_W, h = FRAME_H) {
-    let frame = "idle1";
+    const dir = DRAGON_DIR[this.facing] ?? "down";
+    let frame = "idle";
     if (this.state === "idle") {
-      frame = Math.floor(this.animTime / 0.4) % 2 === 0 ? "idle1" : "idle2";
+      frame = Math.floor(this.animTime / 0.4) % 2 === 0 ? "idle" : "idle2";
     } else if (this.state === "attack") {
       frame = "attack";
     }
-    const canvas = this.canvases[frame];
+    const canvas = this.canvases[dir][frame];
     ctx.save();
-    if (this.facingLeft) {
+    if (this.facing === "left") {
       ctx.translate(screenX + w, screenY);
       ctx.scale(-1, 1);
       ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, w, h);
