@@ -70,20 +70,6 @@ html, body {
   font-size: 14px;
 }
 
-.section-title {
-  color: #e8c96a;
-  letter-spacing: 2px;
-  margin-top: 0;
-}
-
-.section-label {
-  color: #b9aa8c;
-  font-size: 13px;
-  margin: 20px 0 8px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
 .panel {
   display: flex;
   flex-direction: column;
@@ -160,28 +146,6 @@ input[type="text"]:focus {
 #profile-name-label {
   color: #ffe9a8;
   font-weight: bold;
-}
-
-.palette-grid {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-bottom: 8px;
-}
-
-.palette-choice {
-  width: 72px;
-  height: 96px;
-  border: 3px solid #4a3d2a;
-  border-radius: 4px;
-  cursor: pointer;
-  background: #1c1720;
-  image-rendering: pixelated;
-}
-
-.palette-choice.selected {
-  border-color: #e8c96a;
-  box-shadow: 0 0 12px rgba(232, 201, 106, 0.5);
 }
 
 #game-screen {

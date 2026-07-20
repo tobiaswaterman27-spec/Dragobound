@@ -53,8 +53,9 @@ export class DialogueRunner {
   }
 
   _substitute(text) {
-    const name = this.state?.character?.name || "friend";
-    return (text || "").replace(/\{name\}/g, name);
+    const fullName = this.state?.character?.name || "friend";
+    const firstName = fullName.split(" ")[0];
+    return (text || "").replace(/\{name\}/g, firstName);
   }
 
   _renderPage() {

@@ -2,7 +2,6 @@ import { input } from "./engine/input.js";
 import { Player } from "./engine/player.js";
 import { World } from "./engine/world.js";
 import { DialogueRunner } from "./engine/dialogue.js";
-import { FRAME_W, FRAME_H, loadImage } from "./engine/sprite.js";
 import * as save from "./engine/save.js";
 
 // Surface uncaught errors visibly -- a blank screen with no clue why is the
@@ -16,12 +15,9 @@ function showFatalError(message) {
 window.addEventListener("error", (e) => showFatalError(e.message || String(e.error)));
 window.addEventListener("unhandledrejection", (e) => showFatalError(String(e.reason)));
 
-const PALETTES = [
-  { id: "player", label: "Silverwind" },
-  { id: "player_azure", label: "Deepwater" },
-  { id: "player_ember", label: "Cinderfall" },
-  { id: "player_shade", label: "Nightbloom" },
-];
+// Corran Thorne is a set protagonist, not a customizable player character --
+// no name entry, no palette picker.
+const PROTAGONIST = { name: "Corran Thorne", palette: "player" };
 
 const els = {
   titleScreen: document.getElementById("title-screen"),
@@ -33,11 +29,6 @@ const els = {
   btnNewGame: document.getElementById("btn-new-game"),
   btnContinue: document.getElementById("btn-continue"),
   btnSwitchProfile: document.getElementById("btn-switch-profile"),
-
-  charCreateScreen: document.getElementById("charcreate-screen"),
-  charName: document.getElementById("char-name"),
-  paletteChoices: document.getElementById("palette-choices"),
-  btnBegin: document.getElementById("btn-begin"),
 
   gameScreen: document.getElementById("game-screen"),
   canvas: document.getElementById("game-canvas"),
@@ -55,7 +46,6 @@ if (!save.isPersistent) {
 }
 
 let currentSignIn = null;
-let selectedPalette = PALETTES[0].id;
 let world = null;
 let state = null;
 let lastTime = performance.now();
@@ -63,7 +53,6 @@ let autosaveT = 0;
 
 function showScreen(name) {
   els.titleScreen.classList.toggle("hidden", name !== "title");
-  els.charCreateScreen.classList.toggle("hidden", name !== "charcreate");
   els.gameScreen.classList.toggle("hidden", name !== "game");
 }
 
@@ -104,43 +93,7 @@ els.btnContinue.addEventListener("click", () => {
 });
 
 els.btnNewGame.addEventListener("click", () => {
-  els.charName.value = currentSignIn;
-  showScreen("charcreate");
-  renderPaletteChoices();
-});
-
-// ---------------------------------------------------------------------------
-// Character creation
-// ---------------------------------------------------------------------------
-function renderPaletteChoices() {
-  els.paletteChoices.innerHTML = "";
-  PALETTES.forEach((p) => {
-    const canvas = document.createElement("canvas");
-    canvas.width = 72;
-    canvas.height = 96;
-    canvas.className = "palette-choice" + (p.id === selectedPalette ? " selected" : "");
-    canvas.title = p.label;
-    const img = loadImage(`assets/sprites/${p.id}.png`);
-    const draw = () => {
-      const c = canvas.getContext("2d");
-      c.imageSmoothingEnabled = false;
-      c.clearRect(0, 0, 72, 96);
-      c.drawImage(img, 0, 0, FRAME_W, FRAME_H, 0, 0, 72, 96);
-    };
-    if (img.complete) draw();
-    else img.onload = draw;
-    canvas.addEventListener("click", () => {
-      selectedPalette = p.id;
-      renderPaletteChoices();
-    });
-    els.paletteChoices.appendChild(canvas);
-  });
-}
-
-els.btnBegin.addEventListener("click", () => {
-  const name = els.charName.value.trim() || currentSignIn;
-  const character = { name, palette: selectedPalette };
-  state = save.newGameState(currentSignIn, character);
+  state = save.newGameState(currentSignIn, { ...PROTAGONIST });
   startWorld();
 });
 
