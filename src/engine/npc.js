@@ -8,7 +8,7 @@ export class Npc extends MovableEntity {
     this.id = def.id;
     this.name = def.name;
     this.sheet = def.sheet;
-    this.sprite = new ActorSprite(`assets/sprites/${def.sheet}.png`);
+    this.sprite = new ActorSprite(def.sheet);
     this.dialogueId = def.dialogueId;
     this.homeX = def.x;
     this.homeY = def.y;

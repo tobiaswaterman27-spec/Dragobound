@@ -1,32 +1,71 @@
-// Must match the native size * SCALE baked into tools/gen_sprites.py (20x40 * 3).
-export const FRAME_W = 60;
-export const FRAME_H = 120;
+// Renders the hand-authored pixel-matrix data in src/data/sprites.js. No
+// external image files: each shape (a grid of role-key characters) is baked
+// once into a small offscreen canvas per character/frame, then blitted with
+// image smoothing off so the pixels stay sharp and blocky at any scale.
+import { HUMANOID_SHAPES, HUMANOID_PALETTES, DRAGON_SHAPE, DRAGON_PALETTES } from "../data/sprites.js";
 
-const cache = new Map();
+export const FRAME_W = 16;
+export const FRAME_H = 26;
 
-export function loadImage(src) {
-  if (cache.has(src)) return cache.get(src);
-  const img = new Image();
-  img.src = src;
-  const promise = new Promise((resolve) => {
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(img);
-  });
-  cache.set(src, img);
-  cache.set(src + ":promise", promise);
-  return img;
+function buildCanvas(rows, palette) {
+  const h = rows.length;
+  const w = rows[0].length;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const cctx = canvas.getContext("2d");
+  const imageData = cctx.createImageData(w, h);
+  const data = imageData.data;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const key = rows[y][x];
+      const i = (y * w + x) * 4;
+      if (key === ".") continue;
+      const hex = palette[key];
+      if (!hex) continue;
+      data[i] = parseInt(hex.slice(1, 3), 16);
+      data[i + 1] = parseInt(hex.slice(3, 5), 16);
+      data[i + 2] = parseInt(hex.slice(5, 7), 16);
+      data[i + 3] = 255;
+    }
+  }
+  cctx.putImageData(imageData, 0, 0);
+  return canvas;
 }
 
-export function preload(srcs) {
-  return Promise.all(srcs.map((s) => loadImage(s), cache.get(s + ":promise")));
+const humanoidCache = new Map();
+function humanoidCanvases(paletteName) {
+  if (humanoidCache.has(paletteName)) return humanoidCache.get(paletteName);
+  const palette = HUMANOID_PALETTES[paletteName] || HUMANOID_PALETTES.player;
+  const built = {};
+  for (const dir of ["down", "up", "side"]) {
+    built[dir] = {};
+    for (const frame of ["idle", "step1", "step2"]) {
+      built[dir][frame] = buildCanvas(HUMANOID_SHAPES[dir][frame], palette);
+    }
+  }
+  humanoidCache.set(paletteName, built);
+  return built;
 }
 
-const ROW_FOR_DIR = { down: 0, up: 1, left: 2, right: 2 };
+const dragonCache = new Map();
+function dragonCanvases(paletteName) {
+  if (dragonCache.has(paletteName)) return dragonCache.get(paletteName);
+  const palette = DRAGON_PALETTES[paletteName] || DRAGON_PALETTES.wyrmling;
+  const built = {};
+  for (const frame of ["idle1", "idle2", "attack"]) {
+    built[frame] = buildCanvas(DRAGON_SHAPE[frame], palette);
+  }
+  dragonCache.set(paletteName, built);
+  return built;
+}
 
-/** Humanoid-style 3x3 (dir x step) animated sprite. */
+const ROW_FOR_DIR = { down: "down", up: "up", left: "side", right: "side" };
+
+/** Humanoid actor: 3 directions x 3 walk frames, all pixel-matrix data. */
 export class ActorSprite {
-  constructor(sheetSrc) {
-    this.img = loadImage(sheetSrc);
+  constructor(paletteName) {
+    this.canvases = humanoidCanvases(paletteName);
     this.dir = "down";
     this.moving = false;
     this.animTime = 0;
@@ -39,38 +78,38 @@ export class ActorSprite {
     else this.animTime = 0;
   }
 
-  _frameCol() {
-    if (!this.moving) return 0;
+  _frame() {
+    if (!this.moving) return "idle";
     const cycle = Math.floor(this.animTime / 0.14) % 4;
-    return cycle === 0 ? 0 : cycle === 1 ? 1 : cycle === 2 ? 0 : 2;
+    return cycle === 0 ? "idle" : cycle === 1 ? "step1" : cycle === 2 ? "idle" : "step2";
   }
 
   draw(ctx, screenX, screenY, w = FRAME_W, h = FRAME_H) {
-    const row = ROW_FOR_DIR[this.dir] ?? 0;
-    const col = this._frameCol();
+    const dirKey = ROW_FOR_DIR[this.dir] ?? "down";
+    const canvas = this.canvases[dirKey][this._frame()];
     const flip = this.dir === "left";
     ctx.save();
     if (flip) {
       ctx.translate(screenX + w, screenY);
       ctx.scale(-1, 1);
-      ctx.drawImage(this.img, col * FRAME_W, row * FRAME_H, FRAME_W, FRAME_H, 0, 0, w, h);
+      ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, w, h);
     } else {
-      ctx.drawImage(this.img, col * FRAME_W, row * FRAME_H, FRAME_W, FRAME_H, screenX, screenY, w, h);
+      ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, screenX, screenY, w, h);
     }
     ctx.restore();
   }
 
   /** Single static idle-down frame, for portraits/menus. */
-  static drawPortrait(ctx, sheetSrc, x, y, w, h) {
-    const img = loadImage(sheetSrc);
-    ctx.drawImage(img, 0, 0, FRAME_W, FRAME_H, x, y, w, h);
+  static drawPortrait(ctx, paletteName, x, y, w, h) {
+    const canvas = humanoidCanvases(paletteName).down.idle;
+    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, x, y, w, h);
   }
 }
 
-/** Small creature sheet: 1 row x 3 cols (idle1, idle2, attack). */
+/** Small creature: idle1/idle2 (bob) + attack (lunge), all pixel-matrix data. */
 export class CreatureSprite {
-  constructor(sheetSrc) {
-    this.img = loadImage(sheetSrc);
+  constructor(paletteName) {
+    this.canvases = dragonCanvases(paletteName);
     this.state = "idle";
     this.animTime = 0;
     this.facingLeft = false;
@@ -84,19 +123,20 @@ export class CreatureSprite {
   }
 
   draw(ctx, screenX, screenY, w = FRAME_W, h = FRAME_H) {
-    let col = 0;
+    let frame = "idle1";
     if (this.state === "idle") {
-      col = Math.floor(this.animTime / 0.4) % 2;
+      frame = Math.floor(this.animTime / 0.4) % 2 === 0 ? "idle1" : "idle2";
     } else if (this.state === "attack") {
-      col = 2;
+      frame = "attack";
     }
+    const canvas = this.canvases[frame];
     ctx.save();
     if (this.facingLeft) {
       ctx.translate(screenX + w, screenY);
       ctx.scale(-1, 1);
-      ctx.drawImage(this.img, col * FRAME_W, 0, FRAME_W, FRAME_H, 0, 0, w, h);
+      ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, w, h);
     } else {
-      ctx.drawImage(this.img, col * FRAME_W, 0, FRAME_W, FRAME_H, screenX, screenY, w, h);
+      ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, screenX, screenY, w, h);
     }
     ctx.restore();
   }

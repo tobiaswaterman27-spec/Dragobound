@@ -8,7 +8,7 @@ export class Enemy extends MovableEntity {
     this.id = def.id;
     this.kind = def.kind;
     this.name = def.name || "Wyrmling";
-    this.sprite = new CreatureSprite(`assets/sprites/${def.kind}.png`);
+    this.sprite = new CreatureSprite(def.kind);
     this.maxHp = def.hp || 12;
     this.hp = this.maxHp;
     this.damage = def.damage || 2;

@@ -1,3 +1,5 @@
+import { TILES } from "../data/sprites.js";
+
 export const TILE_SIZE = 64;
 
 const LEGEND = {
@@ -18,14 +20,35 @@ const LEGEND = {
   K: { tile: "diary", solid: true },
 };
 
-const tileImageCache = {};
+// Tiles are baked once from the pixel-matrix data in src/data/sprites.js
+// into small offscreen canvases -- no external image files.
+const tileCanvasCache = {};
 export function tileImage(name) {
-  if (!tileImageCache[name]) {
-    const img = new Image();
-    img.src = `assets/tiles/${name}.png`;
-    tileImageCache[name] = img;
+  if (tileCanvasCache[name]) return tileCanvasCache[name];
+  const def = TILES[name];
+  const h = def.rows.length;
+  const w = def.rows[0].length;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const cctx = canvas.getContext("2d");
+  const imageData = cctx.createImageData(w, h);
+  const data = imageData.data;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const key = def.rows[y][x];
+      const i = (y * w + x) * 4;
+      if (key === ".") continue;
+      const hex = def.palette[key];
+      data[i] = parseInt(hex.slice(1, 3), 16);
+      data[i + 1] = parseInt(hex.slice(3, 5), 16);
+      data[i + 2] = parseInt(hex.slice(5, 7), 16);
+      data[i + 3] = 255;
+    }
   }
-  return tileImageCache[name];
+  cctx.putImageData(imageData, 0, 0);
+  tileCanvasCache[name] = canvas;
+  return canvas;
 }
 
 export class TileMap {
@@ -79,7 +102,7 @@ export class TileMap {
         const img = tileImage(legend.tile);
         const sx = Math.round(x * TILE_SIZE - camera.x);
         const sy = Math.round(y * TILE_SIZE - camera.y);
-        ctx.drawImage(img, sx, sy, TILE_SIZE, TILE_SIZE);
+        ctx.drawImage(img, 0, 0, img.width, img.height, sx, sy, TILE_SIZE, TILE_SIZE);
       }
     }
   }

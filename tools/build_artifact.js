@@ -1,6 +1,7 @@
 // Bundles the multi-file ES-module game into a single self-contained HTML
-// file (inline CSS/JS, PNG assets embedded as base64 data URIs) so it can
-// be published as a Claude Artifact, which forbids external requests.
+// file (inline CSS/JS) so it can be published as a Claude Artifact, which
+// forbids external requests. All art is hand-authored pixel-matrix data in
+// src/data/sprites.js -- there are no image files to embed.
 const fs = require("fs");
 const path = require("path");
 
@@ -19,6 +20,7 @@ function stripModuleSyntax(src) {
 const MODULE_ORDER = [
   "src/engine/input.js",
   "src/engine/save.js",
+  "src/data/sprites.js",
   "src/engine/sprite.js",
   "src/engine/tilemap.js",
   "src/engine/entity.js",
@@ -32,24 +34,8 @@ const MODULE_ORDER = [
   "src/main.js",
 ];
 
-// --- 1. Embed all PNG assets as base64 data URIs, keyed by their relative path. ---
-function collectAssets(dir, prefix, map) {
-  for (const f of fs.readdirSync(dir)) {
-    const full = path.join(dir, f);
-    if (fs.statSync(full).isDirectory()) {
-      collectAssets(full, `${prefix}${f}/`, map);
-    } else if (f.endsWith(".png")) {
-      const b64 = fs.readFileSync(full).toString("base64");
-      map[`${prefix}${f}`] = `data:image/png;base64,${b64}`;
-    }
-  }
-}
-const assetMap = {};
-collectAssets(path.join(ROOT, "assets"), "assets/", assetMap);
-const assetJson = JSON.stringify(assetMap);
-
-// --- 2. Bundle JS modules in dependency order, stripping import/export. ---
-let bundle = `const ASSET_DATA = ${assetJson};\n`;
+// --- 1. Bundle JS modules in dependency order, stripping import/export. ---
+let bundle = "";
 for (const rel of MODULE_ORDER) {
   const src = fs.readFileSync(path.join(ROOT, rel), "utf8");
   bundle += `\n// ---- ${rel} ----\n` + stripModuleSyntax(src) + "\n";
@@ -60,20 +46,10 @@ for (const rel of MODULE_ORDER) {
   }
 }
 
-// Redirect asset loads (relative "assets/..." paths) to the embedded data URIs.
-bundle = bundle.replace(
-  "function loadImage(src) {",
-  "function loadImage(src) {\n  src = ASSET_DATA[src] || src;"
-);
-bundle = bundle.replace(
-  'img.src = `assets/tiles/${name}.png`;',
-  'img.src = ASSET_DATA[`assets/tiles/${name}.png`] || `assets/tiles/${name}.png`;'
-);
-
-// --- 3. Inline CSS. ---
+// --- 2. Inline CSS. ---
 const css = fs.readFileSync(path.join(ROOT, "src/style.css"), "utf8");
 
-// --- 4. Reuse the body markup from index.html (everything between <body> and the module script). ---
+// --- 3. Reuse the body markup from index.html (everything between <body> and the module script). ---
 const indexHtml = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
 const bodyMatch = indexHtml.match(/<body>([\s\S]*?)<script type="module"/);
 const bodyMarkup = bodyMatch[1].trim();

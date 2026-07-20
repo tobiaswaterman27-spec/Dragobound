@@ -112,7 +112,7 @@ function objectiveText(s) {
 
 function startWorld() {
   showScreen("game");
-  const player = new Player(state.x, state.y, `assets/sprites/${state.character.palette}.png`, state.hp, state.maxHp);
+  const player = new Player(state.x, state.y, state.character.palette, state.hp, state.maxHp);
   world = new World(state, dlg, null);
   world.setPlayer(player);
   lastTime = performance.now();
