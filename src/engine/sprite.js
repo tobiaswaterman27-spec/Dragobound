@@ -2,10 +2,12 @@
 // external image files: each shape (a grid of role-key characters) is baked
 // once into a small offscreen canvas per character/frame, then blitted with
 // image smoothing off so the pixels stay sharp and blocky at any scale.
-import { HUMANOID_SHAPES, HUMANOID_PALETTES, DRAGON_SHAPE, DRAGON_PALETTES } from "../data/sprites.js";
+// Every character has its own authored shape set + palette (see
+// tools/gen_pixel_art.py), not a palette swap of one shared body.
+import { CHARACTERS, DRAGONS } from "../data/sprites.js";
 
-export const FRAME_W = 16;
-export const FRAME_H = 26;
+export const FRAME_W = 24;
+export const FRAME_H = 36;
 
 function buildCanvas(rows, palette) {
   const h = rows.length;
@@ -34,29 +36,29 @@ function buildCanvas(rows, palette) {
 }
 
 const humanoidCache = new Map();
-function humanoidCanvases(paletteName) {
-  if (humanoidCache.has(paletteName)) return humanoidCache.get(paletteName);
-  const palette = HUMANOID_PALETTES[paletteName] || HUMANOID_PALETTES.player;
+function humanoidCanvases(characterName) {
+  if (humanoidCache.has(characterName)) return humanoidCache.get(characterName);
+  const data = CHARACTERS[characterName] || CHARACTERS.villager_m;
   const built = {};
   for (const dir of ["down", "up", "side"]) {
     built[dir] = {};
     for (const frame of ["idle", "step1", "step2"]) {
-      built[dir][frame] = buildCanvas(HUMANOID_SHAPES[dir][frame], palette);
+      built[dir][frame] = buildCanvas(data.shapes[dir][frame], data.palette);
     }
   }
-  humanoidCache.set(paletteName, built);
+  humanoidCache.set(characterName, built);
   return built;
 }
 
 const dragonCache = new Map();
-function dragonCanvases(paletteName) {
-  if (dragonCache.has(paletteName)) return dragonCache.get(paletteName);
-  const palette = DRAGON_PALETTES[paletteName] || DRAGON_PALETTES.wyrmling;
+function dragonCanvases(kind) {
+  if (dragonCache.has(kind)) return dragonCache.get(kind);
+  const data = DRAGONS[kind] || DRAGONS.wyrmling;
   const built = {};
   for (const frame of ["idle1", "idle2", "attack"]) {
-    built[frame] = buildCanvas(DRAGON_SHAPE[frame], palette);
+    built[frame] = buildCanvas(data.shapes[frame], data.palette);
   }
-  dragonCache.set(paletteName, built);
+  dragonCache.set(kind, built);
   return built;
 }
 
