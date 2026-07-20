@@ -540,8 +540,8 @@ def build_humanoid(spec, direction, step, attack=0):
         d.ellipse([cap[0], cap[1], cap[2], face[3] - 1], fill=m("hair"))
         d.rectangle([cap[0] + 3, face[3] - 5, cap[2] - 3, t_top], fill=m("hair"))  # nape
         d.line([(cap[0] + 3, t_top - 1), (cap[2] - 3, t_top - 1)], fill=m("hairShadow"))  # hair ends
-        # a soft vertical shadow down one side gives round form without a swirl
-        d.line([(cap[0] + 2, cap[1] + 5), (cap[0] + 2, face[3] - 4)], fill=m("hairShadow"))
+        # nothing else -- a plain clean rounded mass; the auto rim-shadow gives
+        # the sides their form. No stripe, no swirl.
         if hair == "pigtails":
             for tie_x in (cap[0] - 1, cap[2] - 1):  # ties sit at the tail root, off the head
                 d.rectangle([tie_x, cap[3] - 1, tie_x + 1, cap[3]], fill=m("accent"))
@@ -817,41 +817,43 @@ def build_dragon(direction, frame, winged):
         d.line([(16, 10 - bob), (16, 22 - bob)], fill=m("bodyShadow"))  # skull ridge
         _dragon_horns(d, bob=bob)
 
-    else:  # side profile, facing right -- SAME big-head / small-body chibi
-        # proportions as down/up, just turned. head y6..24, body y24..41.
+    else:  # side profile, facing right -- the SAME stacked head-on-body as
+        # the front (head and body both centred, not leaning), with a snout
+        # and one eye added so it reads as a profile.
         # tail curling down-left behind the body
-        d.line([(6, 32 - bob), (2, 26 - bob)], fill=m("body"), width=3)
-        d.polygon([(1, 27 - bob), (1, 22 - bob), (5, 25 - bob)], fill=m("horn"))
-        # small round body, lower-left
-        d.ellipse([3, 24 - bob, 17, 41 - bob], fill=m("body"))
-        d.ellipse([6, 30 - bob, 14, 40 - bob], fill=m("belly"))
-        d.line([(7, 35 - bob), (13, 35 - bob)], fill=m("bellyShadow"))
-        # two little feet
-        d.rectangle([5, 39 - bob, 8, 42], fill=m("bodyShadow"))
-        d.rectangle([11, 39 - bob, 14, 42], fill=m("body"))
-        d.point([(5, 43), (8, 43), (11, 43), (14, 43)], fill=m("horn"))
-        if winged:  # folded wing on the near shoulder
-            d.polygon([(6, 25 - bob), (9, 17 - bob), (15, 26 - bob)], fill=m("wing"))
-            d.line([(9, 19 - bob), (13, 25 - bob)], fill=m("bodyShadow"))
+        d.line([(7, 33 - bob), (2, 27 - bob)], fill=m("body"), width=3)
+        d.polygon([(1, 28 - bob), (1, 23 - bob), (5, 26 - bob)], fill=m("horn"))
+        # body, centred (same as front)
+        d.ellipse([7, 24 - bob, 23, 41 - bob], fill=m("body"))
+        d.ellipse([10, 30 - bob, 20, 40 - bob], fill=m("belly"))
+        d.line([(11, 35 - bob), (19, 35 - bob)], fill=m("bellyShadow"))
+        # feet: one near, one back
+        d.rectangle([16, 39 - bob, 19, 42], fill=m("body"))
+        d.rectangle([9, 39 - bob, 12, 42], fill=m("bodyShadow"))
+        d.point([(9, 43), (12, 43), (16, 43), (19, 43)], fill=m("horn"))
+        if winged:  # folded wing on the flank
+            d.polygon([(8, 25 - bob), (12, 17 - bob), (18, 26 - bob)], fill=m("wing"))
+            d.line([(12, 19 - bob), (16, 25 - bob)], fill=m("bodyShadow"))
         else:  # frill spikes along the back
-            for fx in (5, 9, 13):
+            for fx in (8, 12, 16):
                 d.polygon([(fx, 25 - bob), (fx + 1, 21 - bob), (fx + 3, 25 - bob)], fill=m("horn"))
-        # big round head on the right, same size as the front head
-        d.ellipse([11, 5 - bob, 27, 23 - bob], fill=m("body"))
-        d.ellipse([22, 12 - bob, 29, 19 - bob], fill=m("body"))  # snout
-        d.point([(28, 14 - bob)], fill=m("bodyShadow"))  # nostril
+        # head, centred and stacked on the body (same as front)
+        d.ellipse([7, 5 - bob, 23, 23 - bob], fill=m("body"))
+        # snout bulging to the right
+        d.ellipse([20, 11 - bob, 28, 19 - bob], fill=m("body"))
+        d.point([(27, 13 - bob)], fill=m("bodyShadow"))  # nostril
         if atk:
-            d.polygon([(22, 17 - bob), (29, 15 - bob), (25, 22 - bob)], fill=m("maw"))
-            d.point([(23, 17 - bob), (28, 16 - bob)], fill=m("horn"))  # fangs
+            d.polygon([(20, 16 - bob), (28, 14 - bob), (24, 21 - bob)], fill=m("maw"))
+            d.point([(21, 16 - bob), (27, 15 - bob)], fill=m("horn"))  # fangs
         else:
-            d.line([(22, 17 - bob), (28, 16 - bob)], fill=m("bodyShadow"))  # mouth
-        # one fierce slit eye + brow, facing right
-        d.rectangle([18, 12 - bob, 20, 14 - bob], fill=m("eye"))
-        d.rectangle([19, 13 - bob, 19, 13 - bob], fill=m("outline"))
-        d.line([(16, 10 - bob), (21, 10 - bob)], fill=m("bodyShadow"))
+            d.line([(21, 16 - bob), (27, 15 - bob)], fill=m("bodyShadow"))  # mouth
+        # one fierce slit eye + angry brow on the right side of the head
+        d.rectangle([15, 12 - bob, 17, 14 - bob], fill=m("eye"))
+        d.rectangle([16, 13 - bob, 16, 13 - bob], fill=m("outline"))
+        d.line([(13, 10 - bob), (18, 11 - bob)], fill=m("bodyShadow"))
         # two swept-back horns on top of the head
-        d.polygon([(14, 6 - bob), (10, 1 - bob), (16, 4 - bob)], fill=m("horn"))
-        d.polygon([(19, 5 - bob), (16, 1 - bob), (22, 4 - bob)], fill=m("horn"))
+        d.polygon([(10, 6 - bob), (6, 1 - bob), (12, 4 - bob)], fill=m("horn"))
+        d.polygon([(15, 5 - bob), (11, 1 - bob), (17, 4 - bob)], fill=m("horn"))
 
     return img
 
