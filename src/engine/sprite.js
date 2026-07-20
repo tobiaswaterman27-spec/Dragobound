@@ -1,5 +1,6 @@
-export const FRAME_W = 64;
-export const FRAME_H = 96;
+// Must match the native size * SCALE baked into tools/gen_sprites.py (20x40 * 3).
+export const FRAME_W = 60;
+export const FRAME_H = 120;
 
 const cache = new Map();
 
