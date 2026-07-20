@@ -74,17 +74,23 @@ export const DIALOGUES = {
     },
   },
 
-  tobin_yssa: {
+  tobin: {
     start: "root",
     nodes: {
       root: {
         speaker: "Tobin Holt",
         text: "The potatoes are smaller every year. Soil's tired, same as the rest of us.|But we feed the Hollow before we feed ourselves. Always have.",
-        next: "yssa",
+        next: null,
       },
-      yssa: {
+    },
+  },
+
+  yssa: {
+    start: "root",
+    nodes: {
+      root: {
         speaker: "Yssa Holt",
-        text: "Don't mind him, he tells that story to everyone.|You watch out for our boy out there. He puts on a brave face, but he's scared same as anyone.",
+        text: "Don't mind Tobin, he tells that potato story to everyone.|You watch out for our boy out there. He puts on a brave face, but he's scared same as anyone.",
         next: null,
       },
     },
@@ -101,7 +107,7 @@ export const DIALOGUES = {
     },
   },
 
-  garrick_mira: {
+  garrick: {
     start: "root",
     nodes: {
       root: {
@@ -114,21 +120,27 @@ export const DIALOGUES = {
         condition: (s) => !s.flags.knifeReceived,
         effect: (s) => { s.flags.knifeReceived = true; },
         text: "Old hunting knife. Not much, but it's got a good edge and it's never once let me down in the Greywood.|Bring it home in one piece. Don't much care about the knife.",
-        next: "mira",
-      },
-      mira: {
-        speaker: "Mira Ashwood",
-        text: "He'd give away his own boots if you asked twice.|Pell hasn't stopped talking about you since he heard you volunteered. Go easy on him, he's young enough to still think this is exciting.",
         next: null,
       },
     },
   },
-  garrick_mira_return: {
+  garrick_return: {
     start: "root",
     nodes: {
       root: {
         speaker: "Garrick Ashwood",
         text: "Knife treating you well?|Good. Now get moving before Mira starts fussing over you too.",
+        next: null,
+      },
+    },
+  },
+
+  mira: {
+    start: "root",
+    nodes: {
+      root: {
+        speaker: "Mira Ashwood",
+        text: "Garrick would give away his own boots if you asked twice.|Pell hasn't stopped talking about you since he heard you volunteered. Go easy on him, he's young enough to still think this is exciting.",
         next: null,
       },
     },

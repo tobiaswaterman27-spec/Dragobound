@@ -77,7 +77,8 @@ export class Player extends MovableEntity {
       }
     }
 
-    this.sprite.update(dt, this.facing, this.moving, this.attacking);
+    const attackPhase = this.attacking ? (this.attackT < 0.12 ? 0 : 1) : -1;
+    this.sprite.update(dt, this.facing, this.moving, attackPhase);
   }
 
   draw(ctx, camera) {

@@ -38,7 +38,7 @@ function buildCanvas(rows, palette) {
 const humanoidCache = new Map();
 function humanoidCanvases(characterName) {
   if (humanoidCache.has(characterName)) return humanoidCache.get(characterName);
-  const data = CHARACTERS[characterName] || CHARACTERS.villager_m;
+  const data = CHARACTERS[characterName] || CHARACTERS.tobin;
   const built = {};
   for (const dir of ["down", "up", "side"]) {
     built[dir] = {};
@@ -70,20 +70,20 @@ export class ActorSprite {
     this.canvases = humanoidCanvases(paletteName);
     this.dir = "down";
     this.moving = false;
-    this.attacking = false;
+    this.attackPhase = -1;
     this.animTime = 0;
   }
 
-  update(dt, dir, moving, attacking = false) {
+  update(dt, dir, moving, attackPhase = -1) {
     this.dir = dir;
     this.moving = moving;
-    this.attacking = attacking;
+    this.attackPhase = attackPhase;
     if (moving) this.animTime += dt;
     else this.animTime = 0;
   }
 
   _frame() {
-    if (this.attacking) return "attack";
+    if (this.attackPhase >= 0) return this.attackPhase === 0 ? "attack1" : "attack2";
     if (!this.moving) return "idle";
     const cycle = Math.floor(this.animTime / 0.14) % 4;
     return cycle === 0 ? "idle" : cycle === 1 ? "step1" : cycle === 2 ? "idle" : "step2";
