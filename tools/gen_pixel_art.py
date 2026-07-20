@@ -525,36 +525,34 @@ def build_humanoid(spec, direction, step, attack=0):
                       fill=m("belt"))
             return
         cx = (cap[0] + cap[2]) // 2   # head center column
-        # rounded hair mass down to the nape, but leave a small neck showing
-        d.ellipse([cap[0], cap[1], cap[2], face[3] - 1], fill=m("hair"))
         neck_top = face[3] - 3
+        # pigtails go FIRST, behind the head, so tails poke out the sides only
+        if hair == "pigtails":
+            for tx0 in (cap[0] - 4, cap[2] - 1):
+                d.ellipse([tx0, cap[3] - 1, tx0 + 5, cap[3] + 9], fill=m("hair"))
+                d.ellipse([tx0 + 1, cap[3] + 4, tx0 + 4, cap[3] + 9], fill=m("hairShadow"))
+        # rounded hair mass down to the nape, leaving a small neck showing
+        d.ellipse([cap[0], cap[1], cap[2], face[3] - 1], fill=m("hair"))
         d.rectangle([cx - 2, neck_top, cx + 1, t_top], fill=m("skinShadow"))  # neck
-        d.ellipse([cap[0] + 2, neck_top - 1, cap[2] - 2, face[3] - 1], fill=m("hair"))  # hair falls over nape sides
+        d.ellipse([cap[0] + 2, neck_top - 1, cap[2] - 2, face[3] - 1], fill=m("hair"))
         d.rectangle([cx - 2, neck_top, cx + 1, face[3] - 1], fill=m("skinShadow"))
-        # crown: a swirl point near the top with two short parting strokes
+        # crown: a single small swirl -- one short parting stroke each side.
+        # No dense vertical strands: on small heads they read as missing chunks.
         crown_y = cap[1] + 3
-        d.line([(cx, crown_y), (cx - 3, crown_y + 4)], fill=m("hairShadow"))
-        d.line([(cx, crown_y), (cx + 3, crown_y + 4)], fill=m("hairShadow"))
-        # a few vertical strand shadows for texture down the back of the head
-        for sx in (cap[0] + 4, cx, cap[2] - 4):
-            d.line([(sx, crown_y + 5), (sx, neck_top - 2)], fill=m("hairShadow"))
+        d.line([(cx, crown_y), (cx - 2, crown_y + 3)], fill=m("hairShadow"))
+        d.line([(cx, crown_y), (cx + 2, crown_y + 3)], fill=m("hairShadow"))
+        if hair == "pigtails":
+            for tie_x in (cap[0] - 1, cap[2] - 1):  # ties sit at the tail root, off the head
+                d.rectangle([tie_x, cap[3] - 1, tie_x + 1, cap[3]], fill=m("accent"))
         if hair == "long":
             d.rectangle([cap[0] + 1, face[3] - 5, cap[2] - 1, t_top + 5], fill=m("hair"))
-            for sx in (cap[0] + 3, cx - 1, cx + 2, cap[2] - 3):
-                d.line([(sx, face[3] - 4), (sx, t_top + 4)], fill=m("hairShadow"))
+            d.line([(cap[0] + 3, face[3] - 3), (cap[0] + 3, t_top + 4)], fill=m("hairShadow"))
+            d.line([(cap[2] - 3, face[3] - 3), (cap[2] - 3, t_top + 4)], fill=m("hairShadow"))
         if hair == "bun":
-            # embossed knot on the back of the head: a dark ring makes it read
-            # as raised without needing room above the silhouette
             by0 = cap[1] + 2
             d.ellipse([cx - 5, by0 - 1, cx + 4, by0 + 9], fill=m("hairShadow"))  # ring
             d.ellipse([cx - 4, by0, cx + 3, by0 + 8], fill=m("hair"))            # knot
             d.arc([cx - 4, by0 + 3, cx + 3, by0 + 8], 20, 160, fill=m("hairShadow"))
-        if hair == "pigtails":
-            # two tails poking clearly out past the sides of the head
-            for side_x, tie_x in ((cap[0] - 4, cap[0]), (cap[2] - 1, cap[2] - 1)):
-                d.ellipse([side_x, cap[3], side_x + 5, cap[3] + 9], fill=m("hair"))
-                d.ellipse([side_x + 1, cap[3] + 4, side_x + 4, cap[3] + 9], fill=m("hairShadow"))
-                d.rectangle([tie_x, cap[3] - 1, tie_x + 1, cap[3] + 1], fill=m("accent"))  # tie
         if hair == "bald_fringe":
             # crown of scalp, ring of hair only around the sides and back-bottom
             d.ellipse([cap[0] + 3, cap[1] + 2, cap[2] - 3, cap[3] + 3], fill=m("skinShadow"))
