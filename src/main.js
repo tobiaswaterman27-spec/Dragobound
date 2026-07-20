@@ -15,9 +15,9 @@ function showFatalError(message) {
 window.addEventListener("error", (e) => showFatalError(e.message || String(e.error)));
 window.addEventListener("unhandledrejection", (e) => showFatalError(String(e.reason)));
 
-// Corran Thorne is a set protagonist, not a customizable player character --
+// Dain Thorne is a set protagonist, not a customizable player character --
 // no name entry, no palette picker.
-const PROTAGONIST = { name: "Corran Thorne", palette: "player" };
+const PROTAGONIST = { name: "Dain Thorne", palette: "player" };
 
 const els = {
   titleScreen: document.getElementById("title-screen"),
