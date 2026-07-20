@@ -200,7 +200,7 @@ def make_palette(bases):
 # ---------------------------------------------------------------------------
 # Humanoid builder -- chibi proportions, 32x44.
 # ---------------------------------------------------------------------------
-def build_humanoid(spec, direction, step):
+def build_humanoid(spec, direction, step, attack=False):
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     child = spec.get("child", False)
@@ -210,21 +210,23 @@ def build_humanoid(spec, direction, step):
 
     # ---------------- layout ----------------
     if child:
-        hd = dict(cap=(9, 10, 22, 19), face=(10, 13, 21, 28), eye_y=21,
-                  eyes=((12, 13), (18, 19)), nose=(15, 25), mouth=(15, 27))
-        t_top, t_bot, t_l, t_r = 29, 36, 10, 21
-        l_top, l_bot, b_top, b_bot = 37, 39, 40, 43
+        hd = dict(cap=(9, 12, 22, 21), face=(10, 15, 21, 30), eye_y=24,
+                  eyes=((12, 14), (18, 20)), nose=(15, 27), mouth=(15, 29))
+        t_top, t_bot, t_l, t_r = 31, 37, 10, 21
+        l_top, l_bot, b_top, b_bot = 38, 40, 41, 43
         ll, rl = (11, 14), (17, 20)
-        a_slv, a_hand = (30, 34), (35, 36)
+        a_slv, a_hand = (32, 35), (36, 37)
         arm_l, arm_r = (7, 9), (22, 24)
         side_arm = (16, 20)
     else:
-        hd = dict(cap=(7, 2, 24, 13), face=(8, 6, 23, 23), eye_y=15,
-                  eyes=((11, 12), (19, 20)), nose=(15, 20), mouth=(15, 22))
-        t_top, t_bot, t_l, t_r = 24, 34, 9, 22
-        l_top, l_bot, b_top, b_bot = 35, 39, 40, 43
+        # GBA-Pokemon proportions: the head is well over half the figure, the
+        # body a short block with stubby legs
+        hd = dict(cap=(7, 4, 24, 15), face=(8, 8, 23, 25), eye_y=18,
+                  eyes=((11, 13), (19, 21)), nose=(15, 22), mouth=(15, 24))
+        t_top, t_bot, t_l, t_r = 26, 35, 9, 22
+        l_top, l_bot, b_top, b_bot = 36, 39, 40, 43
         ll, rl = (10, 14), (17, 21)
-        a_slv, a_hand = (25, 30), (31, 33)
+        a_slv, a_hand = (27, 31), (32, 34)
         arm_l, arm_r = (6, 8), (23, 25)
         side_arm = (16, 21)
 
@@ -272,21 +274,21 @@ def build_humanoid(spec, direction, step):
         d.rectangle([11 + sway, 42, 14 + sway, 43], fill=m("boots"))
         d.rectangle([17 + sway, 42, 20 + sway, 43], fill=m("boots"))
     elif garment == "overalls":
-        d.rectangle([t_l, t_top, t_r, 27], fill=m("torso"))              # shirt
-        d.rectangle([t_l, 28, t_r, t_bot], fill=m("pants"))              # overall body
-        d.rectangle([11, t_top, 12, 27], fill=m("pants"))                # straps
-        d.rectangle([19, t_top, 20, 27], fill=m("pants"))
-        d.point([(11, 28), (20, 28)], fill=m("buckle"))                  # strap buttons
-        d.rectangle([13, 30, 18, 33], fill=m("pantsShadow"))             # bib pocket
+        d.rectangle([t_l, t_top, t_r, 29], fill=m("torso"))              # shirt
+        d.rectangle([t_l, 30, t_r, t_bot], fill=m("pants"))              # overall body
+        d.rectangle([11, t_top, 12, 29], fill=m("pants"))                # straps
+        d.rectangle([19, t_top, 20, 29], fill=m("pants"))
+        d.point([(11, 30), (20, 30)], fill=m("buckle"))                  # strap buttons
+        d.rectangle([13, 32, 18, 34], fill=m("pantsShadow"))             # bib pocket
         d.rectangle([t_l, t_top, t_l, t_bot], fill=m("torsoShadow"))
         d.rectangle([t_r, t_top, t_r, t_bot], fill=m("torsoShadow"))
     elif garment == "armor":
         d.rectangle([t_l, t_top, t_r, t_bot], fill=m("metal"))
         d.rectangle([t_l, t_top, t_l + 1, t_bot], fill=m("metalShadow"))
         d.rectangle([t_r - 1, t_top, t_r, t_bot], fill=m("metalShadow"))
-        d.line([(t_l + 2, 28), (t_r - 2, 28)], fill=m("metalShadow"))    # breastplate seam
-        d.rectangle([13, 27, 18, 38], fill=m("accent"))                  # tabard
-        d.rectangle([15, 27, 16, 38], fill=m("gold"))                    # tabard stripe
+        d.line([(t_l + 2, 30), (t_r - 2, 30)], fill=m("metalShadow"))    # breastplate seam
+        d.rectangle([13, 29, 18, 38], fill=m("accent"))                  # tabard
+        d.rectangle([15, 29, 16, 38], fill=m("gold"))                    # tabard stripe
         d.rectangle([4, t_top, t_l - 1, t_top + 2], fill=m("metal"))     # pauldrons
         d.rectangle([t_r + 1, t_top, 27, t_top + 2], fill=m("metal"))
         d.rectangle([4, t_top + 2, t_l - 1, t_top + 2], fill=m("metalShadow"))
@@ -312,14 +314,37 @@ def build_humanoid(spec, direction, step):
 
     # belt
     if garment in ("tunic", "armor") and not child:
-        d.rectangle([t_l, 32, t_r, 33], fill=m("belt"))
+        d.rectangle([t_l, 33, t_r, 34], fill=m("belt"))
         if direction == "down":
-            d.rectangle([15, 32, 16, 33], fill=m("buckle"))
+            d.rectangle([15, 33, 16, 34], fill=m("buckle"))
 
     # ---------------- arms ----------------
     sleeve = m("metal") if garment == "armor" else m("torso")
     sleeve_sh = m("metalShadow") if garment == "armor" else m("torsoShadow")
-    if direction == "side":
+    if attack:
+        blade = m("metal")
+        if direction == "side":
+            # thrust: arm extended forward, blade out in front
+            d.rectangle([side_arm[1] - 3, a_slv[0] + 1, side_arm[1] + 1, a_slv[0] + 3], fill=sleeve)
+            d.rectangle([side_arm[1] + 2, a_slv[0] + 1, side_arm[1] + 3, a_slv[0] + 3], fill=m("skin"))
+            d.rectangle([side_arm[1] + 4, a_slv[0], side_arm[1] + 4, a_slv[0] + 4], fill=m("gold"))
+            d.rectangle([side_arm[1] + 5, a_slv[0] + 1, 31, a_slv[0] + 2], fill=blade)
+        elif direction == "down":
+            d.rectangle([arm_l[0], a_slv[0], arm_l[1], a_slv[1]], fill=sleeve)
+            d.rectangle([arm_l[0], a_hand[0], arm_l[1], a_hand[1]], fill=m("skin"))
+            # sword arm swings low, blade pointing down beside the leg
+            d.rectangle([arm_r[0], a_slv[0], arm_r[1], a_slv[0] + 2], fill=sleeve)
+            d.rectangle([arm_r[0] + 1, a_slv[0] + 3, arm_r[1] + 1, a_slv[0] + 5], fill=m("skin"))
+            d.rectangle([arm_r[0], a_slv[0] + 6, arm_r[1] + 2, a_slv[0] + 6], fill=m("gold"))
+            d.rectangle([arm_r[0] + 2, a_slv[0] + 7, arm_r[0] + 3, 42], fill=blade)
+        else:  # up: blade raised high beside the head
+            d.rectangle([arm_l[0], a_slv[0], arm_l[1], a_slv[1]], fill=sleeve)
+            d.rectangle([arm_l[0], a_hand[0], arm_l[1], a_hand[1]], fill=m("skin"))
+            d.rectangle([arm_r[0], t_top - 1, arm_r[1] + 2, t_top + 1], fill=sleeve)
+            d.rectangle([26, t_top - 4, 28, t_top - 2], fill=m("skin"))
+            d.rectangle([25, t_top - 5, 29, t_top - 5], fill=m("gold"))
+            d.rectangle([26, 4, 27, t_top - 6], fill=blade)
+    elif direction == "side":
         d.rectangle([side_arm[0], a_slv[0] + arm_off, side_arm[1], a_slv[1] + arm_off], fill=sleeve)
         d.rectangle([side_arm[0], a_slv[0] + arm_off, side_arm[0], a_slv[1] + arm_off], fill=sleeve_sh)
         d.rectangle([side_arm[0], a_slv[1] + arm_off, side_arm[1], a_slv[1] + arm_off], fill=sleeve_sh)  # cuff
@@ -354,9 +379,9 @@ def build_humanoid(spec, direction, step):
 
     if direction == "down":
         d.ellipse(list(face), fill=m("skin"))
+        # Pokemon-style line eyes: simple horizontal dashes
         for ex0, ex1 in hd["eyes"]:
-            d.rectangle([ex0, ey, ex1, ey + 2], fill=m("eye"))
-            d.point([(ex0, ey)], fill=(255, 255, 255, 255))
+            d.rectangle([ex0, ey, ex1, ey], fill=m("eye"))
         d.point([(hd["nose"][0], hd["nose"][1]), (hd["nose"][0] + 1, hd["nose"][1])], fill=m("skinShadow"))
         if spec.get("beard"):
             d.ellipse([face[0] + 2, ey + 3, face[2] - 2, face[3] + 4], fill=m("beard"))
@@ -370,9 +395,8 @@ def build_humanoid(spec, direction, step):
         d.ellipse(list(face), fill=m("skinShadow"))
     else:  # side
         d.ellipse([face[0] + 3, face[1], face[2] + 2, face[3]], fill=m("skin"))
-        ex = face[2] - 3
-        d.rectangle([ex, ey, ex + 1, ey + 2], fill=m("eye"))
-        d.point([(ex, ey)], fill=(255, 255, 255, 255))
+        ex = face[2] - 4
+        d.rectangle([ex, ey, ex + 2, ey], fill=m("eye"))  # line eye
         d.point([(face[2] + 2, ey + 3)], fill=m("skinShadow"))  # nose bump
         if spec.get("beard"):
             d.rectangle([face[0] + 6, ey + 3, face[2] + 1, face[3] + 3], fill=m("beard"))
@@ -382,15 +406,15 @@ def build_humanoid(spec, direction, step):
     def front_hair():
         if headgear == "helm":
             d.ellipse([cap[0], cap[1], cap[2], cap[3] - 2], fill=m("metal"))
-            d.rectangle([cap[0], 13, cap[0] + 2, 21], fill=m("metal"))    # cheek guards
-            d.rectangle([cap[2] - 2, 13, cap[2], 21], fill=m("metalShadow"))
-            d.rectangle([15, 11, 16, 17], fill=m("metalShadow"))          # nose guard
+            d.rectangle([cap[0], 15, cap[0] + 2, 23], fill=m("metal"))    # cheek guards
+            d.rectangle([cap[2] - 2, 15, cap[2], 23], fill=m("metalShadow"))
+            d.rectangle([15, 13, 16, 19], fill=m("metalShadow"))          # nose guard
             d.line([(cap[0] + 2, cap[1] + 3), (cap[0] + 2, cap[3] - 4)], fill=m("metalShadow"))
             return
         if headgear == "straw_hat":
-            d.ellipse([cap[0] - 3, 10, cap[2] + 3, 15], fill=m("straw"))  # brim
-            d.ellipse([cap[0] + 2, 3, cap[2] - 2, 12], fill=m("straw"))   # dome
-            d.rectangle([cap[0] + 2, 10, cap[2] - 2, 11], fill=m("belt")) # band
+            d.ellipse([cap[0] - 3, 12, cap[2] + 3, 17], fill=m("straw"))  # brim
+            d.ellipse([cap[0] + 2, 5, cap[2] - 2, 14], fill=m("straw"))   # dome
+            d.rectangle([cap[0] + 2, 12, cap[2] - 2, 13], fill=m("belt")) # band
             return
         # hair cap over the top half of the head
         d.ellipse([cap[0], cap[1], cap[2], cap[3]], fill=m("hair"))
@@ -434,8 +458,8 @@ def build_humanoid(spec, direction, step):
             d.rectangle([cap[0] + 2, cap[3] + 1, cap[2] - 2, cap[3] + 4], fill=m("metalShadow"))  # neck guard
             return
         if headgear == "straw_hat":
-            d.ellipse([cap[0] - 3, 10, cap[2] + 3, 15], fill=m("straw"))
-            d.ellipse([cap[0] + 2, 3, cap[2] - 2, 12], fill=m("straw"))
+            d.ellipse([cap[0] - 3, 12, cap[2] + 3, 17], fill=m("straw"))
+            d.ellipse([cap[0] + 2, 5, cap[2] - 2, 14], fill=m("straw"))
             return
         d.ellipse([cap[0], cap[1], cap[2], cap[3] + 4], fill=m("hair"))
         d.rectangle([cap[0] + 1, cap[3], cap[0] + 4, cap[3] + 3], fill=m("hairShadow"))
@@ -456,11 +480,11 @@ def build_humanoid(spec, direction, step):
     def side_hair():
         if headgear == "helm":
             d.ellipse([cap[0] + 1, cap[1], cap[2] + 1, cap[3] - 2], fill=m("metal"))
-            d.rectangle([cap[2] - 4, 13, cap[2], 20], fill=m("metalShadow"))  # cheek guard
+            d.rectangle([cap[2] - 4, 15, cap[2], 22], fill=m("metalShadow"))  # cheek guard
             return
         if headgear == "straw_hat":
-            d.ellipse([cap[0] - 2, 10, cap[2] + 4, 15], fill=m("straw"))
-            d.ellipse([cap[0] + 3, 3, cap[2] - 1, 12], fill=m("straw"))
+            d.ellipse([cap[0] - 2, 12, cap[2] + 4, 17], fill=m("straw"))
+            d.ellipse([cap[0] + 3, 5, cap[2] - 1, 14], fill=m("straw"))
             return
         d.ellipse([cap[0] + 1, cap[1], cap[2] + 1, cap[3] - 1], fill=m("hair"))
         d.rectangle([cap[0] + 1, cap[3] - 6, cap[0] + 5, cap[3] + 5], fill=m("hair"))  # back mass
@@ -487,15 +511,15 @@ def build_humanoid(spec, direction, step):
     else:
         side_hair()
 
-    # ---------------- sword on the back ----------------
-    if spec.get("sword"):
+    # ---------------- sword on the back (in hand during attacks) ----------------
+    if spec.get("sword") and not attack:
         if direction == "up":
             d.line([(20, t_top + 2), (12, t_bot + 4)], fill=m("bootsShadow"), width=2)
             d.rectangle([20, t_top - 3, 21, t_top + 1], fill=m("wood"))
             d.rectangle([19, t_top + 1, 22, t_top + 1], fill=m("gold"))
         elif direction == "down":
-            d.rectangle([23, t_top - 4, 24, t_top - 1], fill=m("wood"))
-            d.rectangle([22, t_top - 1, 25, t_top - 1], fill=m("gold"))
+            d.rectangle([24, t_top - 4, 25, t_top - 1], fill=m("wood"))
+            d.rectangle([23, t_top - 1, 26, t_top - 1], fill=m("gold"))
 
     return img
 
@@ -505,16 +529,16 @@ def build_humanoid(spec, direction, step):
 # ---------------------------------------------------------------------------
 CHARACTERS = {
     "player": dict(
-        spec=dict(hair="short", strap=True, sword=True),
+        spec=dict(hair="short", strap=True, sword=True, fighter=True),
         bases=dict(hair="#4a3524", skin="#f0c9a2", torso="#4f6d80", accent="#6d4a30",
                    accent2="#65899c", belt="#8a6d42", pants="#33384c", boots="#5d4630",
-                   wood="#7a5a38", gold="#d8b04a", eye="#26303a"),
+                   wood="#7a5a38", gold="#d8b04a", metal="#b8bcc4", eye="#26303a"),
     ),
     "joran": dict(
-        spec=dict(hair="spiky", strap=True, bracers=True),
+        spec=dict(hair="spiky", strap=True, bracers=True, fighter=True),
         bases=dict(hair="#8a6b40", skin="#e0b088", torso="#5d6653", accent="#54402b",
                    accent2="#6f7a63", belt="#6d5638", pants="#3d3c38", boots="#4a3826",
-                   gold="#d8b04a", wood="#7a5a38", eye="#2e2a22"),
+                   gold="#d8b04a", wood="#7a5a38", metal="#b8bcc4", eye="#2e2a22"),
     ),
     "king": dict(
         spec=dict(hair="short", beard=True, headgear="circlet", garment="robe", sash=True),
@@ -560,87 +584,79 @@ CHARACTERS = {
 # Dragons -- 32x44, two distinct species, three frames each.
 # ---------------------------------------------------------------------------
 def build_wyrmling(frame):
+    """Round-bodied juvenile: big head, big eye, small folded wing. Faces right."""
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     bob = 1 if frame == "idle2" else 0
-    lunge = 3 if frame == "attack" else 0
+    lunge = 2 if frame == "attack" else 0
+    hx = lunge
 
-    # tail with spade tip
-    d.line([(6, 34 - bob), (1, 24 - bob)], fill=m("body"), width=3)
-    d.polygon([(0, 25 - bob), (0, 20 - bob), (4, 24 - bob)], fill=m("horn"))
-    # hind leg
-    d.rectangle([6, 35 - bob, 10, 42], fill=m("bodyShadow"))
-    d.rectangle([5, 41, 11, 43], fill=m("bodyShadow"))
-    d.point([(5, 43), (8, 43), (11, 43)], fill=m("horn"))  # claws
-    # body
-    d.ellipse([3, 20 - bob, 23, 39 - bob], fill=m("body"))
-    d.ellipse([7, 26 - bob, 20, 38 - bob], fill=m("belly"))
-    for by in (30, 33, 36):  # belly segment lines
-        d.line([(9, by - bob), (18, by - bob)], fill=m("bellyShadow"))
-    # folded wing with ribs
-    d.polygon([(5, 22 - bob), (2, 11 - bob), (16, 20 - bob)], fill=m("wing"))
-    d.line([(4, 13 - bob), (14, 20 - bob)], fill=m("bodyShadow"))
-    d.line([(3, 12 - bob), (8, 21 - bob)], fill=m("bodyShadow"))
-    # spine spikes
-    for sx in (10, 14, 18):
-        d.polygon([(sx, 20 - bob), (sx + 1, 16 - bob), (sx + 3, 20 - bob)], fill=m("bodyShadow"))
-    # front leg (raises on attack)
-    d.rectangle([16 + lunge, 33 - bob - lunge, 20 + lunge, 42 - lunge], fill=m("body"))
-    d.rectangle([15 + lunge, 41 - lunge, 21 + lunge, 43 - lunge], fill=m("body"))
-    d.point([(15 + lunge, 43 - lunge), (18 + lunge, 43 - lunge), (21 + lunge, 43 - lunge)], fill=m("horn"))
-    # neck + head
-    hx = 14 + lunge
-    d.ellipse([hx, 6 - bob, hx + 15, 21 - bob], fill=m("body"))
-    d.ellipse([hx + 8, 12 - bob, hx + 17, 19 - bob], fill=m("body"))  # snout
-    d.line([(hx + 2, 8 - bob), (hx + 7, 6 - bob)], fill=m("bodyShadow"))  # brow ridge
+    # tail curl on the left
+    d.line([(6, 37), (1, 32 - bob)], fill=m("body"), width=3)
+    d.polygon([(0, 33 - bob), (0, 29 - bob), (4, 31 - bob)], fill=m("horn"))
+    # small folded wing on the back
+    d.polygon([(6, 27 - bob), (3, 18 - bob), (13, 26 - bob)], fill=m("wing"))
+    # round body, smaller than the head
+    d.ellipse([5, 26 - bob, 23, 42], fill=m("body"))
+    d.ellipse([9, 31 - bob, 20, 41], fill=m("belly"))
+    d.line([(11, 37), (18, 37)], fill=m("bellyShadow"))
+    # stubby feet
+    d.rectangle([8, 41, 12, 43], fill=m("bodyShadow"))
+    d.rectangle([16 + lunge, 41, 20 + lunge, 43], fill=m("bodyShadow"))
+    # big head (chibi), nudges forward on the lunge
+    d.ellipse([8 + hx, 6 - bob, 29 + hx, 27 - bob], fill=m("body"))
+    d.ellipse([22 + hx, 16 - bob, 30 + hx, 23 - bob], fill=m("body"))  # snout
+    d.point([(28 + hx, 18 - bob)], fill=m("bodyShadow"))  # nostril
     if frame == "attack":
-        d.polygon([(hx + 8, 18 - bob), (hx + 17, 17 - bob), (hx + 12, 24 - bob)], fill=m("maw"))
-        d.point([(hx + 9, 18 - bob), (hx + 15, 17 - bob)], fill=m("horn"))  # fangs
+        d.polygon([(22 + hx, 21 - bob), (29 + hx, 20 - bob), (25 + hx, 26 - bob)], fill=m("maw"))
+        d.point([(23 + hx, 21 - bob), (28 + hx, 20 - bob)], fill=m("horn"))  # fangs
     else:
-        d.line([(hx + 8, 18 - bob), (hx + 16, 17 - bob)], fill=m("bodyShadow"))
-    d.rectangle([hx + 4, 11 - bob, hx + 5, 12 - bob], fill=m("eye"))
-    d.point([(hx + 15, 14 - bob)], fill=m("bodyShadow"))  # nostril
-    # horns + ear frill
-    d.line([(hx + 4, 6 - bob), (hx + 2, 1 - bob)], fill=m("horn"), width=2)
-    d.line([(hx + 8, 6 - bob), (hx + 9, 1 - bob)], fill=m("horn"), width=2)
-    d.polygon([(hx, 10 - bob), (hx - 3, 8 - bob), (hx, 14 - bob)], fill=m("wing"))
+        d.line([(23 + hx, 21 - bob), (29 + hx, 20 - bob)], fill=m("bodyShadow"))
+    # big cute eye: colored iris, dark pupil, light glint
+    d.ellipse([13 + hx, 12 - bob, 18 + hx, 18 - bob], fill=m("eye"))
+    d.rectangle([16 + hx, 14 - bob, 17 + hx, 16 - bob], fill=m("outline"))
+    d.point([(14 + hx, 13 - bob)], fill=m("horn"))
+    # two small horns
+    d.polygon([(11 + hx, 8 - bob), (12 + hx, 3 - bob), (15 + hx, 7 - bob)], fill=m("horn"))
+    d.polygon([(19 + hx, 6 - bob), (21 + hx, 2 - bob), (23 + hx, 7 - bob)], fill=m("horn"))
     return img
 
 
 def build_skitterdrake(frame):
+    """Low, long scavenger with a rounded back frill. Faces right."""
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     bob = 1 if frame == "idle2" else 0
-    lunge = 3 if frame == "attack" else 0
+    lunge = 1 if frame == "attack" else 0
+    hx = lunge
 
-    # long low tail
-    d.line([(7, 34 - bob), (0, 28 - bob)], fill=m("body"), width=3)
-    d.line([(3, 30 - bob), (0, 26 - bob)], fill=m("bodyShadow"), width=1)
-    # legs (four, splayed, clawed)
-    for lx in (5, 12):
-        d.rectangle([lx, 37 - bob, lx + 3, 42], fill=m("bodyShadow"))
-        d.point([(lx, 43), (lx + 3, 43)], fill=m("horn"))
-    for lx in (18 + lunge, 24 + lunge):
-        d.rectangle([lx, 37 - bob, lx + 3, 42], fill=m("body"))
-        d.point([(lx, 43), (lx + 3, 43)], fill=m("horn"))
+    # tail
+    d.line([(4, 33 - bob), (0, 27 - bob)], fill=m("body"), width=2)
+    # rounded back frill bumps
+    for fx in (5, 10, 15):
+        d.ellipse([fx, 23 - bob, fx + 4, 28 - bob], fill=m("horn"))
     # long low body
-    d.ellipse([2, 26 - bob, 27, 40 - bob], fill=m("body"))
-    d.ellipse([6, 31 - bob, 23, 39 - bob], fill=m("belly"))
-    d.line([(8, 35 - bob), (21, 35 - bob)], fill=m("bellyShadow"))
-    # back frill spikes
-    for sx in (6, 10, 14, 18):
-        d.polygon([(sx, 27 - bob), (sx + 2, 22 - bob), (sx + 4, 27 - bob)], fill=m("horn"))
-    # head: narrow, long snout
-    hx = 18 + lunge
-    d.ellipse([hx, 17 - bob, hx + 11, 29 - bob], fill=m("body"))
-    d.rectangle([hx + 7, 21 - bob, hx + 13, 26 - bob], fill=m("body"))
+    d.ellipse([2, 26 - bob, 22, 41], fill=m("body"))
+    d.ellipse([6, 31 - bob, 19, 40], fill=m("belly"))
+    d.line([(8, 36), (17, 36)], fill=m("bellyShadow"))
+    # four stubby legs
+    d.rectangle([5, 40, 8, 43], fill=m("bodyShadow"))
+    d.rectangle([11, 40, 14, 43], fill=m("bodyShadow"))
+    d.rectangle([17 + lunge, 40, 20 + lunge, 43], fill=m("body"))
+    d.rectangle([23 + lunge, 40, 26 + lunge, 43], fill=m("body"))
+    # head with a long rounded snout, held low
+    d.ellipse([15 + hx, 13 - bob, 29 + hx, 28 - bob], fill=m("body"))
+    d.rectangle([24 + hx, 19 - bob, 30 + hx, 24 - bob], fill=m("body"))
+    d.point([(29 + hx, 20 - bob)], fill=m("bodyShadow"))  # nostril
     if frame == "attack":
-        d.polygon([(hx + 6, 25 - bob), (hx + 13, 23 - bob), (hx + 11, 29 - bob)], fill=m("maw"))
-        d.point([(hx + 7, 25 - bob), (hx + 11, 24 - bob)], fill=m("horn"))
+        d.polygon([(23 + hx, 23 - bob), (30 + hx, 21 - bob), (26 + hx, 27 - bob)], fill=m("maw"))
+        d.point([(24 + hx, 23 - bob), (28 + hx, 22 - bob)], fill=m("horn"))
     else:
-        d.line([(hx + 5, 25 - bob), (hx + 13, 24 - bob)], fill=m("bodyShadow"))
-    d.rectangle([hx + 3, 20 - bob, hx + 4, 21 - bob], fill=m("eye"))
-    d.point([(hx + 12, 22 - bob)], fill=m("bodyShadow"))
+        d.line([(24 + hx, 23 - bob), (29 + hx, 22 - bob)], fill=m("bodyShadow"))
+    # big eye
+    d.ellipse([19 + hx, 17 - bob, 23 + hx, 22 - bob], fill=m("eye"))
+    d.rectangle([21 + hx, 19 - bob, 22 + hx, 20 - bob], fill=m("outline"))
+    d.point([(20 + hx, 18 - bob)], fill=m("horn"))
     return img
 
 
@@ -674,6 +690,9 @@ def main():
             for frame_name, step in (("idle", 0), ("step1", 1), ("step2", -1)):
                 img = add_outline(build_humanoid(cfg["spec"], direction, step))
                 shapes[direction][frame_name] = to_grid(img)
+            if cfg["spec"].get("fighter"):
+                img = add_outline(build_humanoid(cfg["spec"], direction, 0, attack=True))
+                shapes[direction]["attack"] = to_grid(img)
         characters_out[name] = {"shapes": shapes, "palette": make_palette(cfg["bases"])}
 
     dragons_out = {}

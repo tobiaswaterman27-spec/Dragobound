@@ -77,7 +77,7 @@ export class Player extends MovableEntity {
       }
     }
 
-    this.sprite.update(dt, this.facing, this.moving);
+    this.sprite.update(dt, this.facing, this.moving, this.attacking);
   }
 
   draw(ctx, camera) {
@@ -90,18 +90,5 @@ export class Player extends MovableEntity {
     }
     this.sprite.draw(ctx, sx, sy, w, h);
     ctx.globalAlpha = 1;
-
-    if (this.attacking) {
-      const { dx, dy } = this.facingDelta;
-      const cx = this.pixelX - camera.x + TILE_SIZE / 2 + dx * TILE_SIZE * 0.65;
-      const cy = this.pixelY - camera.y + TILE_SIZE / 2 + dy * TILE_SIZE * 0.65;
-      ctx.save();
-      ctx.strokeStyle = "rgba(255,255,255,0.9)";
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(cx, cy, TILE_SIZE * 0.32, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-    }
   }
 }

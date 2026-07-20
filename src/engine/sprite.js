@@ -42,7 +42,7 @@ function humanoidCanvases(characterName) {
   const built = {};
   for (const dir of ["down", "up", "side"]) {
     built[dir] = {};
-    for (const frame of ["idle", "step1", "step2"]) {
+    for (const frame of Object.keys(data.shapes[dir])) {
       built[dir][frame] = buildCanvas(data.shapes[dir][frame], data.palette);
     }
   }
@@ -70,17 +70,20 @@ export class ActorSprite {
     this.canvases = humanoidCanvases(paletteName);
     this.dir = "down";
     this.moving = false;
+    this.attacking = false;
     this.animTime = 0;
   }
 
-  update(dt, dir, moving) {
+  update(dt, dir, moving, attacking = false) {
     this.dir = dir;
     this.moving = moving;
+    this.attacking = attacking;
     if (moving) this.animTime += dt;
     else this.animTime = 0;
   }
 
   _frame() {
+    if (this.attacking) return "attack";
     if (!this.moving) return "idle";
     const cycle = Math.floor(this.animTime / 0.14) % 4;
     return cycle === 0 ? "idle" : cycle === 1 ? "step1" : cycle === 2 ? "idle" : "step2";
@@ -88,7 +91,8 @@ export class ActorSprite {
 
   draw(ctx, screenX, screenY, w = FRAME_W, h = FRAME_H) {
     const dirKey = ROW_FOR_DIR[this.dir] ?? "down";
-    const canvas = this.canvases[dirKey][this._frame()];
+    const frames = this.canvases[dirKey];
+    const canvas = frames[this._frame()] || frames.idle;
     const flip = this.dir === "left";
     ctx.save();
     if (flip) {
