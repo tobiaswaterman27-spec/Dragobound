@@ -5,6 +5,17 @@ import { DialogueRunner } from "./engine/dialogue.js";
 import { FRAME_W, FRAME_H, loadImage } from "./engine/sprite.js";
 import * as save from "./engine/save.js";
 
+// Surface uncaught errors visibly -- a blank screen with no clue why is the
+// worst failure mode, especially inside embeds where devtools aren't handy.
+const fatalErrorEl = document.getElementById("fatal-error");
+function showFatalError(message) {
+  if (!fatalErrorEl) return;
+  fatalErrorEl.textContent = `Dragobound hit an error and may not work correctly:\n${message}`;
+  fatalErrorEl.classList.remove("hidden");
+}
+window.addEventListener("error", (e) => showFatalError(e.message || String(e.error)));
+window.addEventListener("unhandledrejection", (e) => showFatalError(String(e.reason)));
+
 const PALETTES = [
   { id: "player", label: "Silverwind" },
   { id: "player_azure", label: "Deepwater" },
@@ -37,6 +48,11 @@ const els = {
 
 const ctx = els.canvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
+
+if (!save.isPersistent) {
+  const hint = els.signinPanel.querySelector(".hint");
+  if (hint) hint.textContent = "This browser is blocking saved progress here -- you can still play, it just won't be remembered after you leave.";
+}
 
 let currentSignIn = null;
 let selectedPalette = PALETTES[0].id;
