@@ -97,7 +97,7 @@ export class Enemy extends MovableEntity {
 
   draw(ctx, camera) {
     if (this.dead && this.deathT > 0.5) return;
-    const w = TILE_SIZE * 1.1;
+    const w = TILE_SIZE * 1.05;
     const h = FRAME_H * (w / FRAME_W);
     const sx = this.pixelX - camera.x + TILE_SIZE / 2 - w / 2;
     let sy = this.pixelY - camera.y + TILE_SIZE - h + 14;

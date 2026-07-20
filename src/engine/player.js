@@ -81,7 +81,7 @@ export class Player extends MovableEntity {
   }
 
   draw(ctx, camera) {
-    const w = TILE_SIZE * 1.3;
+    const w = TILE_SIZE * 1.05;
     const h = FRAME_H * (w / FRAME_W);
     const sx = this.pixelX - camera.x + TILE_SIZE / 2 - w / 2;
     const sy = this.pixelY - camera.y + TILE_SIZE - h + 6;

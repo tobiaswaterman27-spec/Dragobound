@@ -6,8 +6,8 @@
 // tools/gen_pixel_art.py), not a palette swap of one shared body.
 import { CHARACTERS, DRAGONS } from "../data/sprites.js";
 
-export const FRAME_W = 24;
-export const FRAME_H = 36;
+export const FRAME_W = 32;
+export const FRAME_H = 44;
 
 function buildCanvas(rows, palette) {
   const h = rows.length;
