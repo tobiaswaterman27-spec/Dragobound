@@ -531,13 +531,12 @@ def build_humanoid(spec, direction, step, attack=0):
             for tx0 in (cap[0] - 4, cap[2] - 1):
                 d.ellipse([tx0, cap[3] - 1, tx0 + 5, cap[3] + 9], fill=m("hair"))
                 d.ellipse([tx0 + 1, cap[3] + 4, tx0 + 4, cap[3] + 9], fill=m("hairShadow"))
-        # rounded hair mass down to the nape, leaving a small neck showing
+        # rounded hair mass; hair falls all the way to the shoulders so no
+        # bare neck pokes through from behind
         d.ellipse([cap[0], cap[1], cap[2], face[3] - 1], fill=m("hair"))
-        d.rectangle([cx - 2, neck_top, cx + 1, t_top], fill=m("skinShadow"))  # neck
-        d.ellipse([cap[0] + 2, neck_top - 1, cap[2] - 2, face[3] - 1], fill=m("hair"))
-        d.rectangle([cx - 2, neck_top, cx + 1, face[3] - 1], fill=m("skinShadow"))
+        d.rectangle([cap[0] + 3, face[3] - 5, cap[2] - 3, t_top], fill=m("hair"))  # nape
+        d.line([(cap[0] + 3, t_top - 1), (cap[2] - 3, t_top - 1)], fill=m("hairShadow"))  # hair ends
         # crown: a single small swirl -- one short parting stroke each side.
-        # No dense vertical strands: on small heads they read as missing chunks.
         crown_y = cap[1] + 3
         d.line([(cx, crown_y), (cx - 2, crown_y + 3)], fill=m("hairShadow"))
         d.line([(cx, crown_y), (cx + 2, crown_y + 3)], fill=m("hairShadow"))
