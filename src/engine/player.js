@@ -6,6 +6,9 @@ import { input } from "./input.js";
 const ATTACK_DURATION = 0.28;
 const ATTACK_COOLDOWN = 0.12;
 const HURT_INVULN = 0.7;
+const DODGE_DISTANCE = 3;
+const DODGE_DURATION = 0.14;
+const DODGE_COOLDOWN = 0.6;
 
 export class Player extends MovableEntity {
   constructor(gridX, gridY, sheetSrc, hp, maxHp) {
@@ -15,6 +18,7 @@ export class Player extends MovableEntity {
     this.maxHp = maxHp;
     this.attackT = -1;
     this.attackCooldown = 0;
+    this.dodgeCooldown = 0;
     this.hurtT = 0;
     this.dead = false;
     this.controlsEnabled = true;
@@ -44,6 +48,7 @@ export class Player extends MovableEntity {
     super.update(dt);
     if (this.hurtT > 0) this.hurtT = Math.max(0, this.hurtT - dt);
     if (this.attackCooldown > 0) this.attackCooldown -= dt;
+    if (this.dodgeCooldown > 0) this.dodgeCooldown -= dt;
     if (this.attackT >= 0) {
       this.attackT += dt;
       if (this.attackT > ATTACK_DURATION * 0.4 && this.attackT - dt <= ATTACK_DURATION * 0.4) {
@@ -69,10 +74,15 @@ export class Player extends MovableEntity {
       else if (input.isDown("left")) dx = -1;
       else if (input.isDown("right")) dx = 1;
       if (dx !== 0 || dy !== 0) {
-        const moved = this.startMove(dx, dy, (nx, ny) => map.canWalk(nx, ny));
-        if (!moved) {
-          if (dx !== 0) this.facing = dx > 0 ? "right" : "left";
-          else this.facing = dy > 0 ? "down" : "up";
+        if (input.wasPressed("dodge") && this.dodgeCooldown <= 0) {
+          const dashed = this.startDash(dx, dy, (nx, ny) => map.canWalk(nx, ny), DODGE_DISTANCE, DODGE_DURATION);
+          if (dashed) this.dodgeCooldown = DODGE_COOLDOWN;
+        } else {
+          const moved = this.startMove(dx, dy, (nx, ny) => map.canWalk(nx, ny));
+          if (!moved) {
+            if (dx !== 0) this.facing = dx > 0 ? "right" : "left";
+            else this.facing = dy > 0 ? "down" : "up";
+          }
         }
       }
     }

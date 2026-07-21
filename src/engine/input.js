@@ -4,6 +4,7 @@ const KEY_MAP = {
   ArrowLeft: "left", KeyA: "left",
   ArrowRight: "right", KeyD: "right",
   Space: "attack",
+  KeyQ: "dodge",
   Enter: "interact", KeyE: "interact",
   Escape: "cancel",
   Digit1: "digit1", Digit2: "digit2", Digit3: "digit3", Digit4: "digit4",

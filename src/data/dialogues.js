@@ -3,72 +3,60 @@
 // `state` is the live save-state object (state.flags holds story flags).
 
 export const DIALOGUES = {
+  // ---- Q1: A Quiet Morning -- ten short personal scenes ----
+
+  alden_hollow: {
+    start: "root",
+    nodes: {
+      root: {
+        speaker: "King Alden Vethar",
+        condition: (s) => !s.flags.met_alden,
+        effect: (s) => { s.flags.met_alden = true; },
+        text: "Up early, {name}. Good. I'll want you sharp today.|Solmere's collectors are due within the week. I mean to have words with their captain this time, about the tribute weighing more each season while we have less and less to give.|You've grown into a fine young man. Your father would be proud of the knight you're becoming -- I only wish I could say I did more than watch from a distance.",
+        next: null,
+        else: "again",
+      },
+      again: {
+        speaker: "King Alden Vethar",
+        text: "Go on, {name}. See to the others before the day gets away from us.",
+        next: null,
+      },
+    },
+  },
+
   joran_intro: {
     start: "root",
     nodes: {
       root: {
         speaker: "Joran Holt",
-        text: "Still can't sleep either, huh?|Feels wrong, doesn't it. Same ruins we grew up in. Same eleven doors.|My mother says a wyrmling's been sniffing around the east wall again. Probably worth a look before it gets bold.",
-        next: "hub",
+        condition: (s) => !s.flags.met_joran,
+        effect: (s) => { s.flags.met_joran = true; },
+        text: "Couldn't sleep either, huh?|Feels wrong, doesn't it. Same cracked walls, same eleven doors, same wasteland past the fence line. Some mornings I forget there's a whole world past the Greywood.|Marrow says a wyrmling's been sniffing around the tree line again. Watch yourself if you go past the gate.",
+        next: null,
+        else: "again",
       },
-      hub: {
+      again: {
         speaker: "Joran Holt",
-        text: "Anything else?",
-        choices: [
-          { label: "How's your family holding up?", next: "family" },
-          { label: "Do you ever think about what's past the Greywood?", next: "greywood" },
-          { label: "I should go.", next: null },
-        ],
-      },
-      family: {
-        speaker: "Joran Holt",
-        text: "Ma and Pa don't complain. Wren does enough of that for all of us.|Small mercy is we've still got each other. Not everyone here can say that.",
-        next: "hub",
-      },
-      greywood: {
-        speaker: "Joran Holt",
-        text: "Sometimes. Then I remember what lives in it, and I stop.|Marrow says even the small dragons that pass through are older than this whole village. Doesn't exactly make we want to go looking.",
-        next: "hub",
-      },
-    },
-  },
-
-  joran_after_q1: {
-    start: "root",
-    nodes: {
-      root: {
-        speaker: "Joran Holt",
-        text: "Good work back there. You didn't hesitate.|Wish I could say the same the first time I saw one of those things up close.",
+        text: "Quiet morning. Won't stay that way, I'd bet.",
         next: null,
       },
     },
   },
 
-  sela: {
+  marrow_hollow: {
     start: "root",
     nodes: {
       root: {
-        speaker: "Sela Vane",
-        text: "Come to check on the widow, have you? You're kind, for a soon-to-be knight.|Careful out there. The Greywood doesn't care how brave you are.",
-        choices: [
-          { label: "How did you lose your arm?", next: "arm" },
-          { label: "Do you have any family besides yourself?", next: "family" },
-          { label: "Take care, Sela.", next: null },
-        ],
-      },
-      arm: {
-        speaker: "Sela Vane",
-        text: "A long time ago. A different kind of war than the one you're about to see.|I don't talk about it much. Some days I still reach for things with a hand that isn't there anymore.",
+        speaker: "Marrow Fenn",
+        condition: (s) => !s.flags.met_marrow,
+        effect: (s) => { s.flags.met_marrow = true; },
+        text: "You're up before the sun's earned it. Come to pick my brain, or just to see if I ever actually sleep?|I've been at the old records again. Solmere never formally annexed the Hollow, never renamed it, never resettled it -- for a hundred years of conquest, that's not carelessness. That's a rule someone's still following.|I don't have the shape of it yet. But I will. Ask me again when I do.",
         next: null,
+        else: "again",
       },
-      family: {
-        speaker: "Sela Vane",
-        text: "...",
-        next: "family2",
-      },
-      family2: {
-        speaker: "Sela Vane",
-        text: "No. Not anymore.|Go on, now. Alden will want you at the council.",
+      again: {
+        speaker: "Marrow Fenn",
+        text: "Still turning it over in my head. Give me time.",
         next: null,
       },
     },
@@ -79,7 +67,15 @@ export const DIALOGUES = {
     nodes: {
       root: {
         speaker: "Tobin Holt",
-        text: "The potatoes are smaller every year. Soil's tired, same as the rest of us.|But we feed the Hollow before we feed ourselves. Always have.",
+        condition: (s) => !s.flags.met_tobin,
+        effect: (s) => { s.flags.met_tobin = true; },
+        text: "Morning, {name}. Come look at this if you want to see something sorry.|Potatoes are smaller every year. Soil's gone tired and grey same as the rest of the Hollow. Half this row won't be worth pulling.|But we feed the Hollow before we feed ourselves, and we'll find something to hand the collectors besides. Always have.",
+        next: null,
+        else: "again",
+      },
+      again: {
+        speaker: "Tobin Holt",
+        text: "Still not much to show for it. But it's ours.",
         next: null,
       },
     },
@@ -90,9 +86,13 @@ export const DIALOGUES = {
     nodes: {
       root: {
         speaker: "Yssa Holt",
-        text: "Don't mind Tobin, he tells that potato story to everyone.|You watch out for our boy out there. He puts on a brave face, but he's scared same as anyone.",
+        condition: (s) => !s.flags.met_yssa,
+        effect: (s) => { s.flags.met_yssa = true; },
+        text: "Don't mind Tobin, he tells that potato story to anyone who'll stand still.|You watch out for our boy when you two are off together. Joran puts on a brave face, but he's scared same as anyone -- he just won't say it where Wren can hear.",
         next: null,
+        else: "again",
       },
+      again: { speaker: "Yssa Holt", text: "Go on, dear. Long day ahead, I expect.", next: null },
     },
   },
 
@@ -101,9 +101,13 @@ export const DIALOGUES = {
     nodes: {
       root: {
         speaker: "Wren Holt",
-        text: "You're going with Joran when the soldiers come, aren't you.|Tell him... tell him to come back. He always says he will. Make him mean it this time.",
+        condition: (s) => !s.flags.met_wren,
+        effect: (s) => { s.flags.met_wren = true; },
+        text: "You and Joran are always off somewhere together. Never me.|I'm not a baby, you know. I could hold a sword if anyone bothered to teach me.|...Just don't let him do anything stupid out there. He listens to you more than he lets on.",
         next: null,
+        else: "again",
       },
+      again: { speaker: "Wren Holt", text: "One day I'm coming with you. Just watch.", next: null },
     },
   },
 
@@ -112,16 +116,18 @@ export const DIALOGUES = {
     nodes: {
       root: {
         speaker: "Garrick Ashwood",
-        text: "Figured you'd come by before you left. Here.",
+        text: "Figured you'd come by before the day got ahead of us. Here.",
         next: "give_knife",
       },
       give_knife: {
         speaker: "Garrick Ashwood",
         condition: (s) => !s.flags.knifeReceived,
-        effect: (s) => { s.flags.knifeReceived = true; },
-        text: "Old hunting knife. Not much, but it's got a good edge and it's never once let me down in the Greywood.|Bring it home in one piece. Don't much care about the knife.",
+        effect: (s) => { s.flags.knifeReceived = true; s.flags.met_garrick = true; },
+        text: "This was your father's. I kept it since the day I found him in the Greywood and buried him myself -- didn't feel right leaving it with the dirt.|Good edge. Never once let me down out there. It's past time it went back to Thorne blood.|Bring yourself home in one piece. Don't much care about the knife.",
         next: null,
+        else: "return",
       },
+      return: { speaker: "Garrick Ashwood", text: "Knife treating you well? Good.", next: null },
     },
   },
   garrick_return: {
@@ -140,9 +146,13 @@ export const DIALOGUES = {
     nodes: {
       root: {
         speaker: "Mira Ashwood",
-        text: "Garrick would give away his own boots if you asked twice.|Pell hasn't stopped talking about you since he heard you volunteered. Go easy on him, he's young enough to still think this is exciting.",
+        condition: (s) => !s.flags.met_mira,
+        effect: (s) => { s.flags.met_mira = true; },
+        text: "Garrick would give away his own boots if you asked him twice. Hope he didn't talk your ear off.|Pell hasn't stopped following you with his eyes since he could walk. Go easy on him -- he's young enough to still think all this is exciting.",
         next: null,
+        else: "again",
       },
+      again: { speaker: "Mira Ashwood", text: "Mind yourself out there, {name}.", next: null },
     },
   },
 
@@ -151,14 +161,43 @@ export const DIALOGUES = {
     nodes: {
       root: {
         speaker: "Pell Ashwood",
-        text: "I saw the wyrmling first, you know. Before anyone. I shouted loud enough Ma heard me from inside.|Someday I'm going to fight one of those things myself. A big one.",
+        condition: (s) => !s.flags.met_pell,
+        effect: (s) => { s.flags.met_pell = true; },
+        text: "I'm keeping watch today! Da says someone's got to and I've got the sharpest eyes in the Hollow.|Someday I'm going to fight one of those things myself. A big one, not just a wyrmling.",
         choices: [
           { label: "Maybe someday.", next: "maybe" },
-          { label: "Stay safe, Pell.", next: "safe" },
+          { label: "Stay safe up there, Pell.", next: "safe" },
         ],
       },
       maybe: { speaker: "Pell Ashwood", text: "You'll see! I mean it!", next: null },
-      safe: { speaker: "Pell Ashwood", text: "...Yeah. Okay.", next: null },
+      safe: { speaker: "Pell Ashwood", text: "...Yeah. Okay. I'll shout if I see anything.", next: null },
+    },
+  },
+
+  sela: {
+    start: "root",
+    nodes: {
+      root: {
+        speaker: "Sela Vane",
+        condition: (s) => !s.flags.met_sela,
+        effect: (s) => { s.flags.met_sela = true; },
+        text: "Come to check on the widow, have you? You're kind, for a soon-to-be knight.|Careful out there, {name}. The Greywood doesn't care how brave you are, and neither does Solmere.",
+        choices: [
+          { label: "How did you lose your arm?", next: "arm" },
+          { label: "Do you have family besides yourself?", next: "family" },
+          { label: "Take care, Sela.", next: null },
+        ],
+      },
+      arm: {
+        speaker: "Sela Vane",
+        text: "A long time ago. A different kind of war than the one you're about to see.|I don't talk about it much. Some days I still reach for things with a hand that isn't there anymore.",
+        next: null,
+      },
+      family: {
+        speaker: "Sela Vane",
+        text: "...Not anymore. Just me and these four walls.",
+        next: null,
+      },
     },
   },
 
@@ -169,7 +208,7 @@ export const DIALOGUES = {
         speaker: "Weathered Diary",
         condition: (s) => !s.flags.diaryFound,
         effect: (s) => { s.flags.diaryFound = true; },
-        text: "Tucked under a loose stone, forgotten by everyone but you. The leather cover has gone soft with age.|The early pages are just a household ledger -- grain counts, a bad winter, a cough that wouldn't quit.|Near the end, the handwriting changes. Smaller. Faster.|\"...if you're old enough to read this, I'm sorry I couldn't stay to explain it myself. Alden will look after you. He's a better man than this crown ever deserved. Be good. Be brave. I love you more than the Hollow itself.\"|You sit with that a while before you put it back.",
+        text: "Tucked under a loose stone in the ruined hall, forgotten by everyone but you. The leather cover has gone soft with age.|The early pages are just a household ledger -- grain counts, a bad winter, a cough that wouldn't quit.|Near the end, the handwriting changes. Smaller. Faster.|\"...if you're old enough to read this, I'm sorry I couldn't stay to explain it myself. Garrick will see you get this, if nothing else of mine. Be good. Be brave. I love you more than the Hollow itself.\"|You sit with that a while before you put it back.",
         next: null,
         else: "reread",
       },
@@ -181,140 +220,176 @@ export const DIALOGUES = {
     },
   },
 
-  king_locked: {
+  // ---- The horn sounds once everyone has been met ----
+  horn_sounds: {
     start: "root",
     nodes: {
       root: {
-        speaker: "King Alden Vethar",
-        condition: (s) => !s.flags.q1Done,
-        text: "Not yet, {name}. That wyrmling won't wait for a council meeting.|See to the east wall first. Joran should be close by.",
+        speaker: "",
+        effect: (s) => { s.flags.horn = true; },
+        text: "A horn sounds across the Hollow -- long, low, unmistakable.|One by one, doors open. Every face you've spoken to this morning turns toward the ruined hall.|Alden is calling the whole town in.",
         next: null,
       },
     },
   },
 
-  king_council: {
+  // ---- Q2 + Q3: The Council, interrupted ----
+  council: {
     start: "root",
     nodes: {
       root: {
+        speaker: "",
+        text: "The town files into the ruined hall together, packing in around the broken columns. Alden waits at the far end, alone with the weight of what he's about to say.",
+        next: "alden_speech",
+      },
+      alden_speech: {
         speaker: "King Alden Vethar",
-        condition: (s) => s.flags.q1Done && !s.flags.q2Done,
-        text: "There you are. Good -- Marrow, come sit, both of you.|Solmere's collectors are due within the week. I mean to have words with their commander this time, about the tribute weighing more each season while we have less to give.",
-        next: "marrow_join",
+        text: "Thank you for coming. All of you.|You all know Solmere has let Veth Hollow keep its own name, its own roof, its own king, when every other conquered village lost all three in a season. You've heard me call it mercy. It was never mercy.|There is an old word for what we are -- older than the war itself. So long as Veth Hollow still stands as its own people, Solmere fears what ceasing to exist would bring down on them. That fear is the only wall that has ever truly protected us.|I believe that wall is wearing thin. I believe Solmere is done being afraid of us.",
+        next: "pell_burst",
       },
-      marrow_join: {
-        speaker: "Marrow Fenn",
-        text: "Words won't move Solmere, Alden. They never have.|Still. Better to ask than to simply hand over what little we have left.",
-        next: "choices_hub",
+      pell_burst: {
+        speaker: "Pell Ashwood",
+        text: "They're here! I saw them coming through the forest -- soldiers, a whole column of them!",
+        next: "yssa_fear",
       },
-      choices_hub: {
+      yssa_fear: { speaker: "Yssa Holt", text: "Already? It's not even tribute season yet--", next: "tobin_calm" },
+      tobin_calm: { speaker: "Tobin Holt", text: "Easy. Easy. Panicking won't slow them down any.", next: "mira_fear" },
+      mira_fear: { speaker: "Mira Ashwood", text: "Pell, get behind me. Now.", next: "marrow_calm" },
+      marrow_calm: { speaker: "Marrow Fenn", text: "This early is wrong. Whatever they want, it isn't routine.", next: "joran_calm" },
+      joran_calm: { speaker: "Joran Holt", text: "Then we go out and find out together. Standing in here won't help anyone.", next: "alden_lead" },
+      alden_lead: {
         speaker: "King Alden Vethar",
-        text: "Ask what you like. I owe you both honesty, at least.",
-        choices: [
-          { label: "Why does Solmere even bother with us? We have nothing.", next: "why_bother" },
-          { label: "Is it true the Hollow was never truly conquered?", next: "prophecy" },
-          { label: "What happened to my parents?", next: "parents" },
-          { label: "I'm ready.", next: "end", effect: (s) => { s.flags.q2Done = true; } },
-        ],
-      },
-      why_bother: {
-        speaker: "Marrow Fenn",
-        text: "Because 'nothing' still grows grain and cuts timber. And because a beaten people who still remember being free are a habit Solmere would rather break than risk.",
-        next: "choices_hub",
-      },
-      prophecy: {
-        speaker: "King Alden Vethar",
-        text: "There's an old word for it, older than the war. I won't pretend to understand all of it.|Only that Solmere never formally annexed us. Never renamed the Hollow, never resettled it. For a hundred years of conquest, that's... odd. Marrow's studied it longer than I have.",
-        next: "marrow_prophecy",
-      },
-      marrow_prophecy: {
-        speaker: "Marrow Fenn",
-        text: "Odd is a kind word for it. I have my theories. None I'd stake a life on yet.|Ask me again when I have more than theories.",
-        next: "choices_hub",
-      },
-      parents: {
-        speaker: "King Alden Vethar",
-        text: "You know the shape of it as well as I do. A bad winter took more than crops that year.|I made you a promise the day I took you in, and I mean to keep it as long as I'm able. That's all the answer I have.",
-        next: "choices_hub",
-      },
-      end: {
-        speaker: "King Alden Vethar",
-        text: "Go on, both of you. Rest while you still can.",
+        effect: (s) => {
+          s.flags.councilDone = true;
+          s.flags.pendingMapTransition = { to: "hollow", spawn: { x: 10, y: 11, facing: "down" } };
+        },
+        text: "Everyone, outside. Stay together.|Whatever this is, we face it as the Hollow. Not scattered.",
         next: null,
       },
     },
   },
 
-  king_tribute: {
+  // ---- Q4: Tribute Day ----
+  tribute: {
     start: "root",
     nodes: {
       root: {
         speaker: "",
-        condition: (s) => s.flags.q2Done && !s.flags.q3Done,
-        text: "Horns, out past the east wall. Not the wyrmling this time.|Solmeran banners crest the ridge -- more soldiers than Veth Hollow has seen in a decade, marching in tight formation toward the square.",
-        next: "commander",
+        condition: (s) => !s.flags.tributeDone,
+        text: "Five Solmeran soldiers stand at the gate, banners limp in the still air. Their captain steps forward, unhurried, like this is the easiest part of his day.",
+        next: "captain_demand",
+        else: "already",
       },
-      commander: {
-        speaker: "Solmeran Officer",
-        text: "By order of the Crown, Veth Hollow's tribute is reassessed. Effective immediately, this settlement provides two able bodies for the eastern campaign.|King Alden. Step forward.",
-        next: "alden_step",
+      already: { speaker: "", text: "The soldiers have already come and gone.", next: null },
+      captain_demand: {
+        speaker: "Solmeran Captain",
+        text: "Veth Hollow's tribute. Grain, timber, whatever you're calling coin these days. Now.",
+        next: "tobin_offer",
       },
-      alden_step: {
-        speaker: "King Alden Vethar",
-        text: "Take it from me and no one else. These people have given Solmere everything already.",
-        next: "commander2",
+      tobin_offer: {
+        speaker: "Tobin Holt",
+        text: "It's -- it's what we could spare this season, Captain. The soil's given us little enough as it is.",
+        next: "captain_potatoes",
       },
-      commander2: {
-        speaker: "Solmeran Officer",
-        text: "That isn't how tribute works, old man.",
-        next: "strike",
-      },
-      strike: {
+      captain_potatoes: {
         speaker: "",
-        text: "It happens too fast to stop. A single motion, almost bored.|King Alden Vethar, the last king Veth Hollow will ever crown, falls in the square he ruled over for thirty years -- in front of everyone he swore to protect.",
-        next: "silence",
+        text: "Tobin holds out a thin, half-full sack of withered potatoes. The captain takes it by two fingers, weighs it, and lets his disgust show plainly before shoving it at a soldier behind him.",
+        next: "captain_logs",
       },
-      silence: {
+      captain_logs: {
+        speaker: "Solmeran Captain",
+        effect: (s) => { s.flags.logsGone = true; },
+        text: "That, and the wood.|The soldiers strip the wagon log by log, until the bed sits bare and splintered.",
+        next: "captain_soldiers",
+      },
+      captain_soldiers: {
+        speaker: "Solmeran Captain",
+        text: "One more matter. The mountain war has thinned our ranks. Effective today, Veth Hollow provides two able bodies for the eastern front.",
+        next: "alden_refuse",
+      },
+      alden_refuse: {
+        speaker: "King Alden Vethar",
+        text: "No. You have the tribute you came for. These are my people, not Solmere's to spend.",
+        next: "captain_kill",
+      },
+      captain_kill: {
         speaker: "",
         effect: (s) => { s.flags.kingDead = true; },
-        text: "No one moves. No one breathes. Somewhere behind you, Wren starts to cry.",
-        next: "officer_demand",
+        text: "The captain doesn't argue. He doesn't even look angry.|It happens in a single, almost bored motion. King Alden Vethar -- the only king Veth Hollow has known in your lifetime -- falls where he stands, in front of everyone he swore to protect.|No one moves. No one breathes. Somewhere behind you, Wren has started to cry.",
+        next: "captain_ask",
       },
-      officer_demand: {
-        speaker: "Solmeran Officer",
-        text: "Two able bodies. That requirement hasn't changed. Volunteer, or I start choosing for you -- and I promise you won't like my taste.",
+      captain_ask: {
+        speaker: "Solmeran Captain",
+        text: "Two able bodies. That hasn't changed. Who are the knights?",
         next: "volunteer_choice",
       },
       volunteer_choice: {
         speaker: "",
-        text: "Joran is already moving, jaw set, refusing to look at what's left in the square.|The officer's eyes drift over the crowd, unhurried, daring someone else to step forward first.",
+        text: "Joran is already moving before you've finished deciding, jaw set, refusing to look at what's left in the square.",
         choices: [
           {
-            label: "Step forward immediately.",
-            next: "volunteer_yes",
+            label: "Step forward with him, at the same time.",
+            next: "volunteer_together",
             effect: (s) => { s.flags.volunteered = "immediate"; },
           },
           {
-            label: "Hesitate. Let Joran go alone if no one else moves.",
+            label: "Hesitate -- let Joran go first.",
             next: "volunteer_hesitate",
             effect: (s) => { s.flags.volunteered = "hesitant"; },
           },
         ],
       },
-      volunteer_yes: {
+      volunteer_together: {
         speaker: "Joran Holt",
-        text: "...Yeah. Together, then.|Didn't figure you'd make me ask twice.",
-        next: "aftermath",
+        text: "...Together, then. Didn't figure you'd make me ask twice.",
+        next: "marrow_insists",
       },
       volunteer_hesitate: {
         speaker: "Joran Holt",
-        text: "I've got this. Stay with the others.|...Fine. Change your mind fast, if you're changing it at all.",
-        next: "aftermath",
+        text: "I've got this. Stay with the others.",
+        next: "dain_follows",
       },
-      aftermath: {
+      dain_follows: {
         speaker: "",
-        effect: (s) => { s.flags.q3Done = true; s.flags.act1Complete = true; },
-        text: "By dusk, Veth Hollow has a new knight -- or two -- and one fewer king.|The soldiers make camp in the square as if it belongs to them now. Perhaps, in every way that matters, it already did.|-- END OF ACT 1 (DEMO) --|Explore the Hollow while you can. The road to the Greywood, and everything past it, comes next.",
+        text: "A breath later, you step forward anyway. Joran doesn't look surprised.",
+        next: "marrow_insists",
+      },
+      marrow_insists: {
+        speaker: "Marrow Fenn",
+        text: "Then I'm coming too. Someone ought to keep both of these two alive.",
+        next: "captain_laugh",
+      },
+      captain_laugh: {
+        speaker: "Solmeran Captain",
+        effect: (s) => { s.flags.tributeDone = true; s.flags.act1PartyKnown = true; },
+        text: "The soldiers laugh, but no one refuses her. One more mouth on the road changes nothing to them.|Move out. The gate opens at dusk, whether the Hollow is ready or not.",
+        next: null,
+      },
+    },
+  },
+
+  // ---- Q5: Through the Gate -- the first fight ----
+  gate_wyrmling: {
+    start: "root",
+    nodes: {
+      root: {
+        speaker: "",
+        text: "The gate falls shut behind you with a sound like a verdict. Ahead, the tree line is dark and close.",
+        next: "marrow_warn",
+      },
+      marrow_warn: {
+        speaker: "Marrow Fenn",
+        text: "Something's moving out there. Keep your knife up.",
+        next: "break",
+      },
+      break: {
+        speaker: "",
+        text: "A wyrmling breaks from the tree line, low and fast, scales the grey-green of old bark.",
+        next: "marrow_coach",
+      },
+      marrow_coach: {
+        speaker: "Marrow Fenn",
+        text: "WASD or the arrows to move. Space to swing that knife. Hold a direction and tap Q to dodge if it lunges -- it's on a cooldown, so don't waste it.|Go on, {name}. Show me Garrick taught you something.",
         next: null,
       },
     },

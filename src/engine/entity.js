@@ -9,6 +9,7 @@ export class MovableEntity {
     this.facing = facing;
     this.moving = false;
     this.moveT = 0;
+    this.moveDuration = MOVE_DURATION;
     this.fromX = gridX * TILE_SIZE;
     this.fromY = gridY * TILE_SIZE;
     this.toX = this.fromX;
@@ -43,6 +44,37 @@ export class MovableEntity {
     if (!canEnter(nx, ny)) return false;
     this.moving = true;
     this.moveT = 0;
+    this.moveDuration = MOVE_DURATION;
+    this.fromX = this.gridX * TILE_SIZE;
+    this.fromY = this.gridY * TILE_SIZE;
+    this.gridX = nx;
+    this.gridY = ny;
+    this.toX = nx * TILE_SIZE;
+    this.toY = ny * TILE_SIZE;
+    return true;
+  }
+
+  /** A longer, faster step in one direction -- stops at the first blocked tile. */
+  startDash(dx, dy, canEnter, maxDist, duration) {
+    if (this.moving) return false;
+    if (dx !== 0) this.facing = dx > 0 ? "right" : "left";
+    else if (dy !== 0) this.facing = dy > 0 ? "down" : "up";
+    if (dx === 0 && dy === 0) return false;
+    let nx = this.gridX;
+    let ny = this.gridY;
+    let dist = 0;
+    for (let i = 1; i <= maxDist; i++) {
+      const tx = this.gridX + dx * i;
+      const ty = this.gridY + dy * i;
+      if (!canEnter(tx, ty)) break;
+      nx = tx;
+      ny = ty;
+      dist = i;
+    }
+    if (dist === 0) return false;
+    this.moving = true;
+    this.moveT = 0;
+    this.moveDuration = duration;
     this.fromX = this.gridX * TILE_SIZE;
     this.fromY = this.gridY * TILE_SIZE;
     this.gridX = nx;
@@ -55,7 +87,7 @@ export class MovableEntity {
   update(dt) {
     if (!this.moving) return;
     this.moveT += dt;
-    const t = Math.min(1, this.moveT / MOVE_DURATION);
+    const t = Math.min(1, this.moveT / this.moveDuration);
     this.pixelX = this.fromX + (this.toX - this.fromX) * t;
     this.pixelY = this.fromY + (this.toY - this.fromY) * t;
     if (t >= 1) {

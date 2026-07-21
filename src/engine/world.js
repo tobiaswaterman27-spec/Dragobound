@@ -34,7 +34,7 @@ export class World {
     const def = MAP_DEFS[mapId];
     this.map = new TileMap(def);
     this.npcs = (def.npcs || [])
-      .filter((n) => !n.hideIf || !n.hideIf(this.state))
+      .filter((n) => (n.showIf ? n.showIf(this.state) : !n.hideIf || !n.hideIf(this.state)))
       .map((n) => new Npc(n));
     this.enemies = (def.enemies || [])
       .filter((e) => !this.state.flags["defeated_" + e.id])
@@ -79,8 +79,10 @@ export class World {
     this.player.controlsEnabled = false;
     this.dlg.start(tree, this.state, () => {
       this.player.controlsEnabled = true;
-      if (npc && npc.facePlayerAfter) {
-        // no-op hook for future use
+      const pending = this.state.flags.pendingMapTransition;
+      if (pending) {
+        this.state.flags.pendingMapTransition = null;
+        this._loadMap(pending.to, pending.spawn);
       }
     });
   }
@@ -104,7 +106,21 @@ export class World {
   _checkDoors() {
     const door = this.map.doorAt(this.player.gridX, this.player.gridY);
     if (door) {
+      if (door.requires && !this.state.flags[door.requires]) {
+        this.showToast("The gate is barred.");
+        return;
+      }
       this._loadMap(door.to, door.spawn);
+    }
+  }
+
+  // Q1: once every resident of the Hollow has been spoken to, the horn
+  // sounds and Alden calls everyone to the ruined hall.
+  _checkHorn() {
+    if (this.state.flags.horn) return;
+    const met = ["alden", "joran", "marrow", "tobin", "yssa", "wren", "garrick", "mira", "pell", "sela"];
+    if (met.every((id) => this.state.flags["met_" + id])) {
+      this._startDialogue("horn_sounds", null);
     }
   }
 
@@ -127,7 +143,7 @@ export class World {
         e.takeDamage(5);
         if (e.dead) {
           this.state.flags["defeated_" + e.id] = true;
-          if (e.id === "wyrmling_q1") {
+          if (e.id === "wyrmling_gate") {
             this.state.flags.q1Done = true;
             this.showToast("Wyrmling defeated!");
           }
@@ -136,7 +152,19 @@ export class World {
     }
   }
 
+  // Tribute Day: the wagon's logs are stripped away tile by tile once the
+  // dialogue sets logsGone.
+  _checkLogs() {
+    if (!this.map || this.map.id !== "hollow") return;
+    if (!this.state.flags.logsGone) return;
+    if (this.map.charAt(13, 13) === "L") {
+      const row = this.map.rows[13];
+      this.map.rows[13] = row.slice(0, 13) + "." + row.slice(14);
+    }
+  }
+
   update(dt) {
+    this._checkLogs();
     if (this.dlg.isActive()) {
       this.dlg.update();
       this.player.sprite.update(dt, this.player.facing, false);
@@ -144,6 +172,8 @@ export class World {
     }
 
     if (input.wasPressed("interact")) this.handleInteract();
+    this._checkHorn();
+    if (this.dlg.isActive()) return;
 
     this.player.update(dt, this, (frontTile) => this._onPlayerAttack(frontTile));
     if (!this.player.moving) {

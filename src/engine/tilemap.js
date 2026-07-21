@@ -3,20 +3,46 @@ import { TILES } from "../data/sprites.js";
 export const TILE_SIZE = 64;
 
 const LEGEND = {
-  ".": { tile: "grass", solid: false },
+  // ground (walkable)
+  ".": { tile: "waste", solid: false },     // barren Hollow ground
+  ",": { tile: "grass", solid: false },     // living grass (Greywood)
+  '"': { tile: "deadgrass", solid: false },
+  a: { tile: "ash", solid: false },
   p: { tile: "dirt", solid: false },
   S: { tile: "stone", solid: false },
+  // terrain / obstacles (solid)
   "~": { tile: "water", solid: true },
   b: { tile: "bush", solid: true },
   r: { tile: "rubble", solid: true },
+  t: { tile: "deadtree", solid: true },
+  e: { tile: "fence", solid: true },
+  o: { tile: "well", solid: true },
+  P: { tile: "potato", solid: true },
+  G: { tile: "wagon", solid: true },
+  L: { tile: "logs", solid: true },
+  n: { tile: "column", solid: true },
+  // walls / structures
   "#": { tile: "wall", solid: true },
+  c: { tile: "castle_wall", solid: true },
+  u: { tile: "castle_rubble", solid: true },
   W: { tile: "house_wall", solid: true },
   R: { tile: "house_roof", solid: true },
   D: { tile: "door", solid: false },
+  A: { tile: "gate", solid: false },        // gate (opens as a door when unlocked)
+  // interior
   w: { tile: "wood_floor", solid: false },
+  g: { tile: "rug", solid: false },
+  h: { tile: "hearth", solid: true },
+  s: { tile: "shelf", solid: true },
+  i: { tile: "window", solid: true },
   T: { tile: "table", solid: true },
+  H: { tile: "chair", solid: true },
   B: { tile: "bed", solid: true },
   C: { tile: "chest", solid: true },
+  x: { tile: "barrel", solid: true },
+  X: { tile: "crate", solid: true },
+  y: { tile: "straw", solid: false },
+  q: { tile: "pot", solid: true },
   K: { tile: "diary", solid: true },
 };
 

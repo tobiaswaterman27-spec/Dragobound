@@ -103,11 +103,11 @@ els.btnNewGame.addEventListener("click", () => {
 const dlg = new DialogueRunner(els.dialogueBox);
 
 function objectiveText(s) {
-  if (!s.flags.q1Done) return "A wyrmling has wandered near the east wall. Get close and press SPACE to attack!";
-  if (!s.flags.q2Done) return "Find King Alden inside the Great Hall and speak with him.";
-  if (!s.flags.q3Done) return "Explore Veth Hollow -- talk to people, look inside houses, find what's hidden.";
-  if (s.flags.act1Complete) return "End of Act 1 (demo). Keep exploring Veth Hollow while you wait for what's next.";
-  return "";
+  if (s.flags.q1Done) return "End of Act 1 (demo). Keep exploring past the gate while you wait for what's next.";
+  if (s.flags.tributeDone) return "The gate is open. Head south and leave Veth Hollow.";
+  if (s.flags.councilDone) return "The soldiers are at the gate.";
+  if (s.flags.horn) return "The horn has sounded -- head to the ruined hall.";
+  return "Talk to everyone in Veth Hollow before the horn sounds.";
 }
 
 function startWorld() {
