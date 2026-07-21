@@ -419,7 +419,7 @@ def build_humanoid(spec, direction, step, attack=0):
             else:
                 d.rectangle([t_r + 1, sh_y, t_r + 3, sh_y + 3], fill=sleeve)
                 d.rectangle([t_r + 1, sh_y + 3, t_r + 3, sh_y + 4], fill=sleeve_sh)
-        if spec.get("staff") and direction == "down":
+        if spec.get("staff") and direction in ("down", "up"):
             d.rectangle([28, 8, 29, 41], fill=m("wood"))
             d.ellipse([26, 3, 31, 8], fill=m("orb"))
 
@@ -470,6 +470,7 @@ def build_humanoid(spec, direction, step, attack=0):
             return
         if headgear == "straw_hat":
             d.ellipse([cap[0] - 3, cap[3] - 3, cap[2] + 3, cap[3] + 2], fill=m("straw"))
+            d.line([(cap[0] - 2, cap[3] + 2), (cap[2] + 2, cap[3] + 2)], fill=m("strawShadow"))
             d.ellipse([cap[0] + 2, cap[1] + 1, cap[2] - 2, cap[3] - 1], fill=m("straw"))
             d.rectangle([cap[0] + 2, cap[3] - 3, cap[2] - 2, cap[3] - 2], fill=m("belt"))
             return
@@ -493,8 +494,8 @@ def build_humanoid(spec, direction, step, attack=0):
             d.ellipse([cap[2] - 5, cap[1] - 2, cap[2], cap[1] + 3], fill=m("hair"))
             d.ellipse([cap[2] - 4, cap[1] - 1, cap[2] - 1, cap[1] + 2], fill=m("hairShadow"))
         if hair == "pigtails":
-            d.ellipse([cap[0] - 3, cap[3] - 2, cap[0] + 1, cap[3] + 4], fill=m("hair"))
-            d.ellipse([cap[2] - 1, cap[3] - 2, cap[2] + 3, cap[3] + 4], fill=m("hair"))
+            d.ellipse([cap[0] - 2, cap[3], cap[0] + 1, cap[3] + 5], fill=m("hair"))
+            d.ellipse([cap[2] - 1, cap[3], cap[2] + 2, cap[3] + 5], fill=m("hair"))
         if hair == "bald_fringe":
             d.ellipse([cap[0] + 2, cap[1] + 2, cap[2] - 2, cap[3] + 1], fill=m("skin"))
             d.rectangle([cap[0], cap[3] - 2, cap[0] + 2, cap[3] + 4], fill=m("hair"))
@@ -523,17 +524,19 @@ def build_humanoid(spec, direction, step, attack=0):
             d.rectangle([cap[0] + 2, cap[3] - 2, cap[2] - 2, cap[3] - 1], fill=m("belt"))  # band
             return
         if headgear == "kerchief":
-            d.ellipse([cap[0] + 1, cap[1] + 1, cap[2] - 1, face[3] - 2], fill=m("accent"))
+            d.ellipse([cap[0], cap[1] + 1, cap[2], face[3] - 1], fill=m("accent"))
+            d.line([(cap[0] + 2, cap[1] + 6), (cap[2] - 2, cap[1] + 6)], fill=m("accent2"))
             d.polygon([(14, face[3] - 3), (17, face[3] - 3), (16, face[3] + 2), (15, face[3] + 2)],
                       fill=m("belt"))
             return
         cx = (cap[0] + cap[2]) // 2   # head center column
         neck_top = face[3] - 3
-        # pigtails go FIRST, behind the head, so tails poke out the sides only
+        # pigtails go FIRST, behind the head, so only slim tails poke out low
+        # on the sides -- thin and small enough to read as hair, not growths.
         if hair == "pigtails":
-            for tx0 in (cap[0] - 4, cap[2] - 1):
-                d.ellipse([tx0, cap[3] - 1, tx0 + 5, cap[3] + 9], fill=m("hair"))
-                d.ellipse([tx0 + 1, cap[3] + 4, tx0 + 4, cap[3] + 9], fill=m("hairShadow"))
+            for tx0 in (cap[0] - 2, cap[2] - 2):
+                d.ellipse([tx0, cap[3] + 1, tx0 + 4, cap[3] + 8], fill=m("hair"))
+                d.ellipse([tx0 + 1, cap[3] + 5, tx0 + 3, cap[3] + 8], fill=m("hairShadow"))
         # rounded hair mass matching the FRONT silhouette (same cap ellipse),
         # falling to the shoulders so no bare neck shows. No crown swirl -- it
         # kept reading as an unnatural mark.
@@ -544,7 +547,7 @@ def build_humanoid(spec, direction, step, attack=0):
         # the sides their form. No stripe, no swirl.
         if hair == "pigtails":
             for tie_x in (cap[0] - 1, cap[2] - 1):  # ties sit at the tail root, off the head
-                d.rectangle([tie_x, cap[3] - 1, tie_x + 1, cap[3]], fill=m("accent"))
+                d.rectangle([tie_x, cap[3] + 1, tie_x + 1, cap[3] + 2], fill=m("accent"))
         if hair == "long":
             d.rectangle([cap[0] + 1, face[3] - 5, cap[2] - 1, t_top + 5], fill=m("hair"))
             d.line([(cap[0] + 3, face[3] - 3), (cap[0] + 3, t_top + 4)], fill=m("hairShadow"))
@@ -571,6 +574,7 @@ def build_humanoid(spec, direction, step, attack=0):
             return
         if headgear == "straw_hat":
             d.ellipse([cap[0] - 2, cap[3] - 3, cap[2] + 4, cap[3] + 2], fill=m("straw"))
+            d.line([(cap[0] - 1, cap[3] + 2), (cap[2] + 3, cap[3] + 2)], fill=m("strawShadow"))
             d.ellipse([cap[0] + 3, cap[1] + 1, cap[2] - 1, cap[3] - 1], fill=m("straw"))
             return
         if headgear == "kerchief":
@@ -589,7 +593,7 @@ def build_humanoid(spec, direction, step, attack=0):
             d.ellipse([cap[0] - 1, cap[1] + 3, cap[0] + 4, cap[1] + 9], fill=m("hair"))
             d.ellipse([cap[0], cap[1] + 4, cap[0] + 3, cap[1] + 8], fill=m("hairShadow"))
         if hair == "pigtails":
-            d.ellipse([cap[0] - 2, cap[3] - 2, cap[0] + 2, cap[3] + 4], fill=m("hair"))
+            d.ellipse([cap[0] - 1, cap[3], cap[0] + 3, cap[3] + 5], fill=m("hair"))
         if hair == "bald_fringe":
             d.ellipse([cap[0] + 3, cap[1] + 2, cap[2], cap[3]], fill=m("skin"))
             d.rectangle([cap[0] + 1, cap[3] - 3, cap[0] + 5, cap[3] + 5], fill=m("hair"))
